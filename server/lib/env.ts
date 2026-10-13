@@ -17,3 +17,4 @@ export const env = envSchema.parse({
   AI_PROVIDER: process.env.AI_PROVIDER || "gemini",
   AI_API_KEY: process.env.AI_API_KEY,
 });
+

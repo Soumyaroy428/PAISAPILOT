@@ -25,3 +25,4 @@ export function formatPaiseToINR(paise: number): string {
 
   return `${isNegative ? "-" : ""}₹${formattedRupees}.${formattedPaise}`;
 }
+

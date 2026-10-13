@@ -40,8 +40,8 @@
   - npm: `11.12.1`
   - Git: `2.51.2.windows.1`
 - **Source Code Status:**
-  - Project repository currently holds verified specification documents in `docs/`, reference PDFs in `pdf/`, and `.gitignore`.
-  - Application source code initialization is scheduled for Checkpoint 1.
+  - Project architecture structured at root level: `client/` (UI components, layouts, utils), `server/` (services, env validation), and `app/` (Next.js App Router routes). `src/` directory removed per user specification.
+  - Checkpoint 1 public website foundation complete and verified.
 
 ---
 

@@ -13,3 +13,4 @@ export function getHealthStatus(): HealthStatus {
     timestamp: new Date().toISOString(),
   };
 }
+
