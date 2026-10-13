@@ -72,30 +72,31 @@ Status Key:
 
 | Module / Feature | Status | Notes / Baseline Evidence |
 |---|---|---|
-| Project Setup & Tooling (Next.js, TS, Tailwind, shadcn) | `NOT STARTED` | No `package.json` or source files in workspace. |
-| Public Website (Landing, Features, How it Works, Security, FAQ, Footer) | `NOT STARTED` | No routes or UI implemented. |
-| Authentication & Session Management (Register, Login, Session cookies) | `NOT STARTED` | No auth provider or endpoints implemented. |
-| Persona-Adaptive Onboarding Quiz | `NOT STARTED` | Spec defined in `prd.md` & `trd.md`; no code yet. |
+| Project Setup & Tooling (Next.js 16 Turbopack, TS, Tailwind, shadcn) | `WORKING` | Initialized, client/server folders organized, type-check & build passing. |
+| Public Website (Landing, Features, How it Works, Security, FAQ, Footer) | `WORKING` | All 8 public routes created with responsive layouts and verified in production build. |
+| Health Check API (`/api/health`) | `WORKING` | Implemented in `src/server/services/health.service.ts` & verified via HTTP curl returning 200 OK. |
+| Authentication & Session Management (Register, Login, Session cookies) | `PARTIAL` | Auth UI entry screens (`/login`, `/register`) created; backend auth scheduled for Checkpoint 2. |
+| Persona-Adaptive Onboarding Quiz | `NOT STARTED` | Spec defined in `prd.md` & `trd.md`; scheduled for Checkpoint 2. |
 | Accounts & Payment Sources (`accounts` collection, labels) | `NOT STARTED` | No schema or CRUD routes implemented. |
-| Manual Income & Expense Transactions (Paise math, CRUD, filters) | `NOT STARTED` | No transaction domain or calculation module yet. |
-| Statement Import Pipeline (CSV / SBI PDF, parsing, preview, commit) | `NOT STARTED` | No parser adapters or worker queue yet. |
-| Financial Dashboard & Analytics (Totals, trends, categories, Recharts) | `NOT STARTED` | No calculation engine or charts yet. |
-| Transaction Categorization (Deterministic rules + AI fallback) | `NOT STARTED` | No category taxonomy or rules engine yet. |
-| Grounded AI Finance Assistant (Restricted tools, prompt-injection defense) | `NOT STARTED` | No AI gateway or tools implemented yet. |
-| Budgets, Recurring Payments & Notifications | `NOT STARTED` | No budget models, detection algorithms, or alert jobs yet. |
-| Cash-Flow Forecasting & Insights | `NOT STARTED` | No projection baseline model implemented yet. |
-| Privacy Controls, Data Export & Account Deletion | `NOT STARTED` | Endpoints and state machines not yet implemented. |
-| Production Hardening & CI/CD | `NOT STARTED` | No GitHub Actions workflow or deployment setup yet. |
+| Manual Income & Expense Transactions (Paise math, CRUD, filters) | `NOT STARTED` | Integer paise conversion utility created (`formatPaiseToINR`); transaction domain scheduled for Checkpoint 3. |
+| Statement Import Pipeline (CSV / SBI PDF, parsing, preview, commit) | `NOT STARTED` | Scheduled for Checkpoint 4. |
+| Financial Dashboard & Analytics (Totals, trends, categories, Recharts) | `NOT STARTED` | Scheduled for Checkpoint 5. |
+| Transaction Categorization (Deterministic rules + AI fallback) | `NOT STARTED` | Scheduled for Checkpoint 6. |
+| Grounded AI Finance Assistant (Restricted tools, prompt-injection defense) | `NOT STARTED` | Scheduled for Checkpoint 7. |
+| Budgets, Recurring Payments & Notifications | `NOT STARTED` | Scheduled for Checkpoint 8. |
+| Cash-Flow Forecasting & Insights | `NOT STARTED` | Scheduled for Checkpoint 9. |
+| Privacy Controls, Data Export & Account Deletion | `PARTIAL` | Legal/Privacy screens (`/privacy`, `/terms`, `/security`) live; functional export/deletion scheduled for Checkpoint 10. |
+| Production Hardening & CI/CD | `NOT STARTED` | Next.js production build passes locally; CI/CD scheduled for Checkpoint 10. |
 | Authorized Bank Integration (Account Aggregator) | `NOT STARTED` | Explicitly deferred until verified provider eligibility. |
 
 ---
 
 ## 5. Verification & Tests Executed
 
-- **Lint / Type Check:** N/A (`package.json` not yet initialized; no JS/TS files to lint).
-- **Unit / Integration / E2E Tests:** N/A (Test runners Vitest / Playwright not yet initialized).
-- **Production Build:** N/A (Build script not yet available).
-- **Environment & Directory Inspection:** Executed (`node -v`, `npm -v`, `git status`, file tree scans). Confirmed clean directory containing only documentation.
+- **Lint / Type Check:** `npm run type-check` (`tsc --noEmit`) -> **PASS (0 errors)**.
+- **Production Build:** `npm run build` (`next build` with Turbopack) -> **PASS (12 static & dynamic routes compiled successfully)**.
+- **Health Check Smoke Test:** `http://localhost:3007/api/health` -> **PASS (Returned HTTP 200 `{"status":"ok","app":"PaisaPilot","version":"1.0.0"}`)**.
+- **Directory Structure:** Refactored into clean `src/client/` (frontend components, UI, layout, utilities) and `src/server/` (backend services, env validation) separation with verified path aliases.
 
 ---
 
@@ -112,23 +113,24 @@ Status Key:
 
 ## 7. Deployment Readiness & Blockers
 
-- **Vercel Readiness:** `NOT READY` (Application not yet created; requires Next.js project initialization, `.env.example`, and clean build).
-- **Render Readiness:** `NOT READY` (Persistent worker not yet required or created).
-- **Blockers:**
-  1. Project skeleton needs initialization.
-  2. MongoDB connection string placeholder and configuration needed.
-  3. Authentication secret and provider configuration needed.
+- **Vercel Readiness:** `CONDITIONALLY READY` (Local Next.js production build passes with 0 errors. Awaiting MongoDB credentials and Auth secrets for full deployment).
+- **Render Readiness:** `NOT REQUIRED FOR MVP` (Background jobs can run in serverless/route tasks initially).
+- **Blockers for Checkpoint 2:**
+  1. MongoDB Atlas connection string (placeholder configured in `.env.example`).
+  2. Authentication provider selection and session secret.
 
 ---
 
 ## 8. Next Recommended Checkpoint
 
-- **Checkpoint 1 — Project Setup and Public Website:**
-  - Initialize Next.js App Router with TypeScript and Tailwind CSS.
-  - Initialize isolated Git repository and `.gitignore`.
-  - Install and configure UI primitives (shadcn/ui, Lucide icons).
-  - Configure server-only environment validation and safe `.env.example`.
-  - Implement public website routes: Landing page (`/`), Features (`/features`), How It Works (`/how-it-works`), Security (`/security`), FAQ (`/faq`), Terms (`/terms`), Privacy (`/privacy`), Header, and Footer.
-  - Implement `/api/health` safe health check endpoint.
-  - Verify lint, type-check, and local production build pass.
+- **Checkpoint 2 — Authentication and Onboarding:**
+  - Setup MongoDB connection handling (singleton client for serverless environments).
+  - Implement User schema & data access layer (`users` collection).
+  - Implement secure server-side session authentication (registration, login, logout, password recovery).
+  - Build post-registration persona-adaptive onboarding quiz ("one-by-one" card flow):
+    - Persona selection: Student, Professional, Freelancer, Family, Small Business.
+    - Dynamic branching questions (inflow, commitments, payment habits).
+    - Auto-seeding default categories and baseline budgets.
+  - Implement `/api/onboarding` endpoints and gatekeeper session protection.
+  - Run auth unit/integration tests and type checking.
 

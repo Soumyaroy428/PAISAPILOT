@@ -5,14 +5,14 @@ Complete and verify each phase before starting the next.
 ## Phase 0 — Repository audit and setup
 - [x] Inspect repo, framework versions, package manager, scripts, and tests.
 - [x] Verify all project documentation and specification files.
-- [ ] Configure formatting, lint, type-check, tests, and `.env.example`.
-- [ ] Confirm secrets and real financial data are excluded from Git.
+- [x] Configure formatting, lint, type-check, tests, and `.env.example`.
+- [x] Confirm secrets and real financial data are excluded from Git.
 **Acceptance:** Fresh install, lint, type-check, and production build work as documented.
 
 ## Phase 1 — Public website and UI foundation
-- [ ] Landing page, feature sections, how it works, security/privacy, FAQ, footer.
-- [ ] Shared responsive and accessible components.
-- [ ] Loading, empty, error, and success states.
+- [x] Landing page, feature sections, how it works, security/privacy, FAQ, footer.
+- [x] Shared responsive and accessible components.
+- [x] Loading, empty, error, and success states.
 **Acceptance:** All public routes and CTAs work on mobile and desktop.
 
 ## Phase 2 — Authentication and profile
