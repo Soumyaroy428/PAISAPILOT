@@ -13,6 +13,7 @@ import {
 } from "@/server/services/account.service";
 import { parseStatementCsv } from "@/server/lib/parsers/csv.parser";
 import { parseSbiPdfStatement } from "@/server/lib/parsers/sbi-pdf.parser";
+import { matchDeterministicCategory } from "@/server/services/categorization.service";
 
 /**
  * Computes SHA-256 hash for file content deduplication.
@@ -121,6 +122,12 @@ export async function createImportPreview(
       }
     }
 
+    const autoCategory = matchDeterministicCategory(raw.description, raw.type);
+    const categoryName =
+      autoCategory.isMatched && autoCategory.categoryName !== "Uncategorized"
+        ? autoCategory.categoryName
+        : undefined;
+
     candidateRows.push({
       rowIndex: raw.rowIndex,
       transactionDate: raw.transactionDate,
@@ -128,6 +135,7 @@ export async function createImportPreview(
       type: raw.type,
       amountPaise: raw.amountPaise,
       referenceNo: raw.referenceNo,
+      categoryName,
       fingerprint,
       status,
       validationError,
@@ -259,6 +267,7 @@ export async function commitImport(
       currency: "INR",
       transactionDate: new Date(row.transactionDate),
       description: row.description,
+      categoryName: row.categoryName,
       accountId: targetAccountId,
       accountName: targetAccount.name,
       source: importRecord.sourceType === "csv" ? "csv_import" : "pdf_import",

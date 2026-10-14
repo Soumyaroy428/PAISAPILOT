@@ -473,8 +473,18 @@ export default function StatementImportPage() {
                           <td className="py-3 px-4 whitespace-nowrap font-medium text-foreground">
                             {row.transactionDate}
                           </td>
-                          <td className="py-3 px-4 font-semibold text-foreground max-w-xs truncate">
-                            {row.description}
+                          <td className="py-3 px-4 font-semibold text-foreground max-w-xs">
+                            <div className="flex items-center space-x-2 truncate">
+                              <span className="truncate">{row.description}</span>
+                              {row.categoryName && (
+                                <Badge
+                                  variant="outline"
+                                  className="text-[9px] font-medium bg-primary/5 text-primary border-primary/20 shrink-0"
+                                >
+                                  {row.categoryName}
+                                </Badge>
+                              )}
+                            </div>
                             {row.validationError && (
                               <p className="text-[10px] text-rose-600 font-normal">{row.validationError}</p>
                             )}

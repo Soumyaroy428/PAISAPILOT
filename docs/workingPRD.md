@@ -82,7 +82,7 @@ Status Key:
 | Manual Income & Expense Transactions (Paise math, CRUD, filters) | `WORKING` | Integer paise model, `server/services/transaction.service.ts`, `app/api/transactions`, atomic balance adjustments, and UI ledger in `app/dashboard/transactions/page.tsx`. |
 | Statement Import Pipeline (CSV / SBI PDF, parsing, preview, commit) | `WORKING` | In-memory private parser, `server/lib/parsers/csv.parser.ts`, `server/lib/parsers/sbi-pdf.parser.ts`, duplicate fingerprinting, candidate staging, preview table UI in `app/dashboard/import/page.tsx`, and idempotent commit. |
 | Financial Dashboard & Analytics (Totals, trends, categories, Recharts) | `WORKING` | Single source of truth calculation engine in `server/services/analytics.service.ts`, Recharts visualizer, accessible table toggle, category matrix, and deep-dive reports in `app/dashboard/reports/page.tsx`. |
-| Transaction Categorization (Deterministic rules + AI fallback) | `NOT STARTED` | Scheduled for Checkpoint 6. |
+| Transaction Categorization (Deterministic rules + AI fallback) | `WORKING` | Deterministic rule dictionary covering 100+ Indian merchants, default taxonomy auto-seeding, user customization, safe auto-categorization runner, and candidate preview badges. |
 | Grounded AI Finance Assistant (Restricted tools, prompt-injection defense) | `NOT STARTED` | Scheduled for Checkpoint 7. |
 | Budgets, Recurring Payments & Notifications | `NOT STARTED` | Scheduled for Checkpoint 8. |
 | Cash-Flow Forecasting & Insights | `NOT STARTED` | Scheduled for Checkpoint 9. |
@@ -95,7 +95,10 @@ Status Key:
 ## 5. Verification & Tests Executed
 
 - **Unit Test Suite (`npm test`):**
-  - **35/35 automated unit tests passing across 11 suites (0 failures).**
+  - **55/55 automated unit tests passing across 13 suites (0 failures).**
+  - Deterministic Indian Merchant Categorization: verified exact categorization across all 11 Indian categories (Swiggy, Blinkit, Uber, IRCTC, Bescom, Amazon, Zerodha, Netflix, Apollo, Salary, Transfers).
+  - Categorization Fallback & Safety: verified graceful fallback to `Uncategorized` for unknown strings/empty inputs, and verified user-confirmed categories are never overwritten.
+  - Category Zod Schemas: verified hex color code validation, minimum/maximum lengths, and partial updates.
   - Exact integer paise formatting: standard amounts, zero, negative/deficit formatting, Indian lakhs grouping.
   - Floating-point drift prevention: verified exact addition/subtraction in paise.
   - Transaction Zod schema boundaries: verified rejection of non-integer floats, zero, negative amounts, and oversized strings.
@@ -108,14 +111,21 @@ Status Key:
   - Period Date Boundary Resolution: verified day-1 00:00:00 to last-day 23:59:59 calculations across months, years, and rolling periods.
   - Single Source of Truth Financial Calculation: verified internal transfers exclusion from P&L, savings rate calculation with zero-income and deficit defense.
   - CSV Formula Injection Defense: verified neutralization of dangerous spreadsheet formula prefixes (`=`, `+`, `-`, `@`) and RFC quoting.
-- **Lint / Type Check:** `npm run type-check` (`tsc --noEmit`) -> **PASS (0 errors across all routes, services, charts, and parsers)**.
-- **Production Build:** `npm run build` (`next build` with Turbopack) -> **PASS (28 routes compiled successfully, including 15 dynamic API routes and 13 static/prerendered pages)**.
+- **Lint / Type Check:** `npm run type-check` (`tsc --noEmit`) -> **PASS (0 errors across all routes, services, charts, models, and parsers)**.
+- **Production Build:** `npm run build` (`next build` with Turbopack) -> **PASS (31 routes compiled successfully, including 18 dynamic API routes and 13 static/prerendered pages)**.
+- **Categories & Intelligence Endpoints:**
+  - `GET /api/categories` -> Returns active categories for authenticated user with auto-seeded Indian defaults.
+  - `POST /api/categories` -> Creates custom category with hex color and normalized uniqueness enforcement.
+  - `GET/PATCH/DELETE /api/categories/[id]` -> Individual category retrieval, modifications, and safe soft-delete archiving.
+  - `POST /api/categories/auto-categorize` -> Evaluates unassigned transactions with deterministic rules, returning summary breakdown while strictly preserving manual labels.
 - **Analytics & Export Endpoints:**
   - `GET /api/analytics/dashboard` -> Aggregates real-time P&L metrics, category distributions, Recharts trend points, and data coverage scope.
   - `GET /api/analytics/export` -> Secure stream download of sanitized CSV and clean JSON transaction exports with date-range filters.
 - **Interactive UI Ledgers & Analytics:**
+  - `app/dashboard/categories/page.tsx` -> Interactive category taxonomy manager, color chips, custom category modal, and one-click auto-categorization runner.
   - `app/dashboard/page.tsx` -> Recharts Cash Flow Inflows vs Outflows visualization, accessible tabular view toggle, budget threshold alert bar, and data coverage notice.
   - `app/dashboard/reports/page.tsx` -> Full P&L breakdown, category expenditure matrix (count, total, average ticket size, % share), and self-serve export center.
+  - `app/dashboard/import/page.tsx` -> Statement import preview table showing auto-detected category badges next to staged candidate rows.
 - **Health Check Smoke Test:** `/api/health` -> **PASS (HTTP 200 OK)**.
 
 ---

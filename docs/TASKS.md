@@ -45,10 +45,13 @@ Complete and verify each phase before starting the next.
 **Acceptance:** All views use the same single source of truth calculation engine.
 
 ## Phase 6 — Categorization
-- [ ] Category taxonomy and user-editable categories.
-- [ ] Deterministic rules and optional AI suggestions.
-- [ ] User correction, accept/dismiss, uncertainty handling.
-**Acceptance:** User-confirmed categories are not silently overwritten.
+- [x] Category taxonomy and user-editable categories (`server/models/category.ts`, `server/services/category.service.ts`).
+- [x] Deterministic rules dictionary tailored for Indian commerce (`server/services/categorization.service.ts` with 100+ merchants: Swiggy, Zomato, Blinkit, Zepto, DMart, Uber, Ola, IRCTC, Bescom, Jio, Netflix, Zerodha, etc.).
+- [x] User correction, accept/dismiss, uncertainty handling, and candidate badge previews in statement imports (`server/services/import.service.ts` + `app/dashboard/import/page.tsx`).
+- [x] Endpoints: `GET/POST /api/categories`, `GET/PATCH/DELETE /api/categories/[id]`, and `POST /api/categories/auto-categorize`.
+- [x] Dedicated UI at `app/dashboard/categories/page.tsx` with color chips, custom category creation, and auto-categorization runner.
+- [x] Automated test suite: `tests/categorization.test.ts` (55 total passing tests across 13 suites).
+**Acceptance:** User-confirmed categories are never silently overwritten. Manual labels and transfers are preserved.
 
 ## Phase 7 — AI assistant
 - [ ] Define supported intents and response schema.

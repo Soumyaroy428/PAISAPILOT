@@ -10,6 +10,7 @@ import {
   getAccountById,
   adjustAccountBalance,
 } from "@/server/services/account.service";
+import { matchDeterministicCategory } from "@/server/services/categorization.service";
 
 export interface PaginatedTransactionsResult {
   transactions: TransactionDocument[];
@@ -157,6 +158,15 @@ export async function createTransaction(
     toAccountName = toAccount.name;
   }
 
+  // Auto-resolve category if not provided by user
+  let categoryName = input.categoryName;
+  if (!categoryName) {
+    const autoMatch = matchDeterministicCategory(input.description, input.type);
+    if (autoMatch.isMatched && autoMatch.categoryName !== "Uncategorized") {
+      categoryName = autoMatch.categoryName;
+    }
+  }
+
   const transactionDoc: Omit<TransactionDocument, "_id"> = {
     userId,
     type: input.type,
@@ -166,7 +176,7 @@ export async function createTransaction(
     description: input.description,
     merchantNormalized: input.merchantNormalized,
     categoryId: input.categoryId,
-    categoryName: input.categoryName,
+    categoryName,
     accountId: input.accountId,
     accountName,
     toAccountId: input.toAccountId,

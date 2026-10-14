@@ -23,6 +23,7 @@ import {
   BarChart3,
   CheckCircle2,
   ArrowRight,
+  Tag,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -488,7 +489,7 @@ export default function DashboardPage() {
       {/* Financial Management Portals */}
       <div className="space-y-3">
         <h2 className="text-lg font-semibold text-foreground">Financial Management Modules</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
           {/* Module 1: Transactions Ledger */}
           <Card className="border-border hover:border-foreground/30 transition-all shadow-sm">
             <CardHeader className="pb-2">
@@ -518,7 +519,7 @@ export default function DashboardPage() {
               </div>
             </CardHeader>
             <CardContent className="space-y-2 text-xs text-muted-foreground">
-              <p>CSV & SBI PDF statements with candidate preview & duplicate defense.</p>
+              <p>CSV &amp; SBI PDF statements with candidate preview &amp; duplicate defense.</p>
               <Link href="/dashboard/import" className="inline-block text-primary font-semibold hover:underline">
                 Import Statements &rarr;
               </Link>
@@ -543,7 +544,25 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          {/* Module 4: Reports & Analytics */}
+          {/* Module 4: Categories & Intelligence */}
+          <Card className="border-border hover:border-foreground/30 transition-all shadow-sm">
+            <CardHeader className="pb-2">
+              <div className="flex items-center space-x-2">
+                <div className="p-2 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                  <Tag className="h-4 w-4" />
+                </div>
+                <CardTitle className="text-sm font-semibold">Categories &amp; Rules</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-2 text-xs text-muted-foreground">
+              <p>Taxonomy, custom tags, and Indian merchant auto-matching rules.</p>
+              <Link href="/dashboard/categories" className="inline-block text-primary font-semibold hover:underline">
+                Manage Tags &rarr;
+              </Link>
+            </CardContent>
+          </Card>
+
+          {/* Module 5: Reports & Analytics */}
           <Card className="border-border hover:border-foreground/30 transition-all shadow-sm">
             <CardHeader className="pb-2">
               <div className="flex items-center space-x-2">
@@ -554,7 +573,7 @@ export default function DashboardPage() {
               </div>
             </CardHeader>
             <CardContent className="space-y-2 text-xs text-muted-foreground">
-              <p>Monthly P&L, spending trends, and secure CSV/JSON export center.</p>
+              <p>Monthly P&amp;L, spending trends, and secure CSV/JSON export center.</p>
               <Link href="/dashboard/reports" className="inline-block text-primary font-semibold hover:underline">
                 View Reports &rarr;
               </Link>
