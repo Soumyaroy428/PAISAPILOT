@@ -75,9 +75,10 @@ Status Key:
 | Project Setup & Tooling (Next.js 16 Turbopack, TS, Tailwind, shadcn) | `WORKING` | Initialized, client/server folders organized, type-check & build passing. |
 | Public Website (Landing, Features, How it Works, Security, FAQ, Footer) | `WORKING` | All 8 public routes created with responsive layouts and verified in production build. |
 | Health Check API (`/api/health`) | `WORKING` | Implemented in `src/server/services/health.service.ts` & verified via HTTP curl returning 200 OK. |
-| Authentication & Session Management (Register, Login, Session cookies) | `PARTIAL` | Auth UI entry screens (`/login`, `/register`) created; backend auth scheduled for Checkpoint 2. |
-| Persona-Adaptive Onboarding Quiz | `NOT STARTED` | Spec defined in `prd.md` & `trd.md`; scheduled for Checkpoint 2. |
-| Accounts & Payment Sources (`accounts` collection, labels) | `NOT STARTED` | No schema or CRUD routes implemented. |
+| Authentication & Session Management (Register, Login, Logout, Cookies) | `WORKING` | Implemented in `server/lib/auth.ts`, `app/api/auth/*`, and UI in `app/login/page.tsx` & `app/register/page.tsx`. Secure HttpOnly session tokens with `jose` & bcrypt. |
+| Persona-Adaptive Onboarding Quiz | `WORKING` | 4-step wizard in `app/onboarding/page.tsx` + `app/api/onboarding` supporting 5 archetypes (student, young_professional, freelancer, family, small_business) with auto-seeded presets and skip option. |
+| Authenticated Dashboard Screen | `WORKING` | Private portal in `app/dashboard/page.tsx` with persona badge, integer paise KPI cards, and financial module navigation. |
+| Accounts & Payment Sources (`accounts` collection, labels) | `NOT STARTED` | Scheduled for Checkpoint 3. |
 | Manual Income & Expense Transactions (Paise math, CRUD, filters) | `NOT STARTED` | Integer paise conversion utility created (`formatPaiseToINR`); transaction domain scheduled for Checkpoint 3. |
 | Statement Import Pipeline (CSV / SBI PDF, parsing, preview, commit) | `NOT STARTED` | Scheduled for Checkpoint 4. |
 | Financial Dashboard & Analytics (Totals, trends, categories, Recharts) | `NOT STARTED` | Scheduled for Checkpoint 5. |
@@ -93,10 +94,22 @@ Status Key:
 
 ## 5. Verification & Tests Executed
 
-- **Lint / Type Check:** `npm run type-check` (`tsc --noEmit`) -> **PASS (0 errors)**.
-- **Production Build:** `npm run build` (`next build` with Turbopack) -> **PASS (12 static & dynamic routes compiled successfully)**.
-- **Health Check Smoke Test:** `http://localhost:3007/api/health` -> **PASS (Returned HTTP 200 `{"status":"ok","app":"PaisaPilot","version":"1.0.0"}`)**.
-- **Directory Structure:** Refactored into clean `src/client/` (frontend components, UI, layout, utilities) and `src/server/` (backend services, env validation) separation with verified path aliases.
+- **Lint / Type Check:** `npm run type-check` (`tsc --noEmit`) -> **PASS (0 errors across all routes and services)**.
+- **Production Build:** `npm run build` (`next build` with Turbopack) -> **PASS (19 routes compiled successfully, including 7 dynamic API routes and 12 static/prerendered pages)**.
+- **Authentication Endpoints:**
+  - `POST /api/auth/register` -> Input validation via Zod, bcrypt hashing (rounds=12), user persistence in MongoDB, HttpOnly cookie emission.
+  - `POST /api/auth/login` -> Email normalization, password verification, secure session cookie issuance.
+  - `POST /api/auth/logout` -> Session cookie invalidation.
+  - `GET /api/auth/me` -> Session verification, returns sanitized user profile and onboarding status.
+- **Onboarding Endpoints:**
+  - `GET /api/onboarding` -> Returns current user onboarding status and saved profile.
+  - `POST /api/onboarding` -> Stores persona selection, income band, commitments, and target budget; auto-seeds persona category presets; supports "Skip for now".
+- **Interactive UI Flows:**
+  - `app/login/page.tsx` -> Interactive login form with loading indicators, error banner, and smart redirects.
+  - `app/register/page.tsx` -> Interactive registration form with password requirements and redirect to onboarding.
+  - `app/onboarding/page.tsx` -> 4-step card wizard with 5 financial personas, interactive commitments selector, and integer paise conversion.
+  - `app/dashboard/page.tsx` -> Protected landing dashboard with persona badge, KPI metrics, and module links.
+- **Health Check Smoke Test:** `/api/health` -> **PASS (HTTP 200 OK)**.
 
 ---
 

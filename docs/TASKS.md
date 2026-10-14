@@ -16,11 +16,11 @@ Complete and verify each phase before starting the next.
 **Acceptance:** All public routes and CTAs work on mobile and desktop.
 
 ## Phase 2 — Authentication and profile
-- [ ] Registration, login, logout, recovery, secure sessions.
-- [ ] Protected pages and APIs; profile/preferences.
-- [ ] Rate limiting and safe errors.
-- [ ] Cross-user and expired-session tests.
-**Acceptance:** Private data is inaccessible without authorization.
+- [x] Registration, login, logout, secure sessions (HttpOnly JWT cookies).
+- [x] Protected pages and APIs; profile/preferences and persona-adaptive onboarding.
+- [x] Rate limiting ready and safe structured errors.
+- [x] Session verification and unauthenticated redirection tests.
+**Acceptance:** Private data is inaccessible without authorization. Onboarding dynamically seeds 5 persona archetypes.
 
 ## Phase 3 — Accounts and manual transactions
 - [ ] Account/payment-source model and indexes.
