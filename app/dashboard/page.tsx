@@ -167,50 +167,67 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-border">
-        <div className="space-y-1">
-          <div className="flex items-center space-x-2">
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
-              Welcome back, {user.displayName}
-            </h1>
-            <Badge variant="outline" className="text-xs font-semibold uppercase tracking-wider bg-primary/10 text-primary border-primary/20">
-              {personaTitle}
-            </Badge>
+      <div className="flex flex-col gap-4 pb-6 border-b border-border">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="space-y-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-foreground">
+                Welcome back, {user.displayName}
+              </h1>
+              <Badge variant="outline" className="text-xs font-semibold uppercase tracking-wider bg-primary/10 text-primary border-primary/20 shrink-0">
+                {personaTitle}
+              </Badge>
+            </div>
+            <p className="text-xs sm:text-sm text-muted-foreground">
+              Account: <span className="font-medium text-foreground">{user.email}</span>
+              <span className="hidden sm:inline"> • Single source of truth calculation engine active</span>
+            </p>
           </div>
-          <p className="text-sm text-muted-foreground">
-            Account: <span className="font-medium text-foreground">{user.email}</span> • Single source of truth calculation engine active
-          </p>
+
+          {/* User Sign Out on desktop */}
+          <div className="hidden sm:flex items-center space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleLogout}
+              disabled={loggingOut}
+              className="text-muted-foreground hover:text-foreground font-medium text-xs h-8"
+            >
+              {loggingOut ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <LogOut className="h-3.5 w-3.5 mr-1.5" />}
+              Sign Out
+            </Button>
+          </div>
         </div>
 
-        {/* Global Action CTAs */}
-        <div className="flex items-center space-x-2 sm:space-x-3">
-          <Link href="/dashboard/assistant">
-            <Button size="sm" variant="outline" className="font-semibold text-xs border-primary/30 text-primary hover:bg-primary/5 shadow-2xs">
-              <Sparkles className="mr-1.5 h-3.5 w-3.5" /> AI Copilot
-            </Button>
-          </Link>
-          <Link href="/dashboard/budgets">
-            <Button size="sm" variant="outline" className="font-semibold text-xs border-border text-foreground hover:bg-muted shadow-2xs">
-              <Target className="mr-1.5 h-3.5 w-3.5 text-rose-500" /> Budgets &amp; Bills
-            </Button>
-          </Link>
-          <Link href="/dashboard/forecast">
-            <Button size="sm" variant="outline" className="font-semibold text-xs border-border text-foreground hover:bg-muted shadow-2xs">
-              <TrendingUp className="mr-1.5 h-3.5 w-3.5 text-teal-500" /> Forecast
-            </Button>
-          </Link>
-          <Link href="/dashboard/transactions">
-            <Button size="sm" className="font-semibold shadow-sm text-xs">
+        {/* Global Action Chips / Buttons */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 sm:flex-wrap no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+          <Link href="/dashboard/transactions" className="shrink-0">
+            <Button size="sm" className="font-semibold shadow-sm text-xs h-8 px-3 whitespace-nowrap">
               <PlusCircle className="mr-1.5 h-3.5 w-3.5" /> Add Txn
             </Button>
           </Link>
-          <a href="/api/analytics/export?format=csv" download>
-            <Button variant="outline" size="sm" className="font-semibold text-xs">
+          <Link href="/dashboard/assistant" className="shrink-0">
+            <Button size="sm" variant="outline" className="font-semibold text-xs border-primary/30 text-primary hover:bg-primary/5 shadow-2xs h-8 px-3 whitespace-nowrap">
+              <Sparkles className="mr-1.5 h-3.5 w-3.5" /> AI Copilot
+            </Button>
+          </Link>
+          <Link href="/dashboard/budgets" className="shrink-0">
+            <Button size="sm" variant="outline" className="font-semibold text-xs border-border text-foreground hover:bg-muted shadow-2xs h-8 px-3 whitespace-nowrap">
+              <Target className="mr-1.5 h-3.5 w-3.5 text-rose-500" /> Budgets &amp; Bills
+            </Button>
+          </Link>
+          <Link href="/dashboard/forecast" className="shrink-0">
+            <Button size="sm" variant="outline" className="font-semibold text-xs border-border text-foreground hover:bg-muted shadow-2xs h-8 px-3 whitespace-nowrap">
+              <TrendingUp className="mr-1.5 h-3.5 w-3.5 text-teal-500" /> Forecast
+            </Button>
+          </Link>
+          <a href="/api/analytics/export?format=csv" download className="shrink-0">
+            <Button variant="outline" size="sm" className="font-semibold text-xs h-8 px-3 whitespace-nowrap">
               <Download className="mr-1.5 h-3.5 w-3.5" /> Export
             </Button>
           </a>
-          <Link href="/dashboard/settings">
-            <Button variant="outline" size="sm" className="font-semibold text-xs border-border text-foreground hover:bg-muted shadow-2xs">
+          <Link href="/dashboard/settings" className="shrink-0">
+            <Button variant="outline" size="sm" className="font-semibold text-xs border-border text-foreground hover:bg-muted shadow-2xs h-8 px-3 whitespace-nowrap">
               <Settings className="mr-1.5 h-3.5 w-3.5" /> Settings
             </Button>
           </Link>
@@ -219,9 +236,9 @@ export default function DashboardPage() {
             size="sm"
             onClick={handleLogout}
             disabled={loggingOut}
-            className="text-muted-foreground hover:text-foreground font-medium"
+            className="sm:hidden shrink-0 text-muted-foreground hover:text-foreground font-medium text-xs h-8 px-3 whitespace-nowrap"
           >
-            {loggingOut ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogOut className="h-4 w-4 mr-1.5" />}
+            {loggingOut ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <LogOut className="h-3.5 w-3.5 mr-1.5" />}
             Sign Out
           </Button>
         </div>
@@ -401,7 +418,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left (2 Cols): Cash Flow Trend Chart with Accessible Alternative */}
         <Card className="lg:col-span-2 border-border shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-3">
+          <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3">
             <div>
               <CardTitle className="text-base font-semibold">Cash Flow Trends</CardTitle>
               <CardDescription className="text-xs">
@@ -412,7 +429,7 @@ export default function DashboardPage() {
               variant="outline"
               size="sm"
               onClick={() => setShowAccessibleTable(!showAccessibleTable)}
-              className="text-xs h-7"
+              className="text-xs h-7 self-start sm:self-auto shrink-0"
             >
               {showAccessibleTable ? <BarChart3 className="h-3.5 w-3.5 mr-1" /> : <Table className="h-3.5 w-3.5 mr-1" />}
               {showAccessibleTable ? "Show Chart" : "Table View"}

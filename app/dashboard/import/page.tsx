@@ -230,7 +230,7 @@ export default function StatementImportPage() {
                 {/* Format Switcher */}
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-foreground">Statement Type</label>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
                     <button
                       type="button"
                       onClick={() => setSourceType("csv")}
@@ -391,21 +391,22 @@ export default function StatementImportPage() {
 
           {/* Action Bar */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div className="flex items-center space-x-2 text-xs">
-              <Button size="sm" variant="outline" onClick={selectAllValid}>
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              <Button size="sm" variant="outline" onClick={selectAllValid} className="text-xs h-8">
                 Select All Valid ({validCount})
               </Button>
-              <Button size="sm" variant="outline" onClick={deselectAll}>
+              <Button size="sm" variant="outline" onClick={deselectAll} className="text-xs h-8">
                 Deselect All
               </Button>
             </div>
 
-            <div className="flex items-center space-x-3">
+            <div className="flex flex-wrap items-center gap-2">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setStep("upload")}
                 disabled={committing}
+                className="text-xs h-8"
               >
                 Upload Different File
               </Button>
@@ -413,7 +414,7 @@ export default function StatementImportPage() {
                 size="sm"
                 onClick={handleCommit}
                 disabled={committing || selectedCount === 0}
-                className="font-semibold shadow-sm bg-primary text-primary-foreground"
+                className="font-semibold shadow-sm bg-primary text-primary-foreground text-xs h-8"
               >
                 {committing ? (
                   <>

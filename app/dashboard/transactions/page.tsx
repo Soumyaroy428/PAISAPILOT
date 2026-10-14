@@ -204,7 +204,7 @@ export default function TransactionsPage() {
           </p>
         </div>
 
-        <div className="flex items-center space-x-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <Link href="/dashboard/accounts">
             <Button variant="outline" size="sm" className="font-semibold text-xs">
               <Wallet className="mr-1.5 h-4 w-4" /> Manage Accounts
@@ -213,7 +213,7 @@ export default function TransactionsPage() {
           <Button
             size="sm"
             onClick={() => setShowAddModal(true)}
-            className="font-semibold shadow-sm"
+            className="font-semibold shadow-sm text-xs"
           >
             <PlusCircle className="mr-1.5 h-4 w-4" /> Add Transaction
           </Button>
@@ -569,97 +569,179 @@ export default function TransactionsPage() {
               </Button>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-muted/50 border-b border-border text-muted-foreground font-medium uppercase tracking-wider">
-                  <tr>
-                    <th className="py-3 px-4">Date</th>
-                    <th className="py-3 px-4">Description</th>
-                    <th className="py-3 px-4">Account / Mode</th>
-                    <th className="py-3 px-4">Type</th>
-                    <th className="py-3 px-4 text-right">Amount</th>
-                    <th className="py-3 px-4 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {transactions.map((tx) => {
-                    const isIncome = tx.type === "income";
-                    const isTransfer = tx.type === "transfer";
-                    const dateFormatted = new Date(tx.transactionDate).toLocaleDateString("en-IN", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                    });
+            <>
+              {/* Mobile Card List (sm:hidden) */}
+              <div className="sm:hidden divide-y divide-border">
+                {transactions.map((tx) => {
+                  const isIncome = tx.type === "income";
+                  const isTransfer = tx.type === "transfer";
+                  const dateFormatted = new Date(tx.transactionDate).toLocaleDateString("en-IN", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  });
 
-                    return (
-                      <tr key={tx._id?.toString()} className="hover:bg-muted/30 transition-colors">
-                        <td className="py-3 px-4 whitespace-nowrap font-medium text-foreground">
-                          {dateFormatted}
-                        </td>
-                        <td className="py-3 px-4">
-                          <div className="font-semibold text-foreground">{tx.description}</div>
+                  return (
+                    <div key={tx._id?.toString()} className="p-4 space-y-2">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="space-y-0.5">
+                          <div className="font-semibold text-sm text-foreground leading-snug">
+                            {tx.description}
+                          </div>
+                          <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+                            <span>{dateFormatted}</span>
+                            <span>•</span>
+                            <span>{tx.accountName || "Unassigned"}</span>
+                            {tx.paymentMode && (
+                              <span className="text-[10px] uppercase font-bold text-primary">
+                                ({tx.paymentMode})
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <div className={`font-bold text-base ${
+                            isIncome
+                              ? "text-emerald-600 dark:text-emerald-400"
+                              : isTransfer
+                              ? "text-sky-600 dark:text-sky-400"
+                              : "text-foreground"
+                          }`}>
+                            {isIncome ? "+" : isTransfer ? "" : "-"}
+                            {formatPaiseToINR(tx.amountPaise)}
+                          </div>
+                          <div className="mt-0.5">
+                            {isIncome ? (
+                              <Badge variant="success" className="text-[10px] py-0">Income</Badge>
+                            ) : isTransfer ? (
+                              <Badge variant="secondary" className="text-[10px] py-0">Transfer</Badge>
+                            ) : (
+                              <Badge variant="destructive" className="text-[10px] py-0">Expense</Badge>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-1">
+                        <div className="flex items-center gap-1.5 overflow-hidden">
                           {tx.categoryName && (
-                            <Badge variant="outline" className="text-[10px] mt-0.5">
+                            <Badge variant="outline" className="text-[10px] shrink-0">
                               {tx.categoryName}
                             </Badge>
                           )}
                           {tx.notes && (
-                            <p className="text-[11px] text-muted-foreground mt-0.5">{tx.notes}</p>
-                          )}
-                        </td>
-                        <td className="py-3 px-4 whitespace-nowrap text-muted-foreground">
-                          <div>{tx.accountName || "Unassigned"}</div>
-                          {tx.paymentMode && (
-                            <span className="text-[10px] uppercase font-medium text-primary">
-                              {tx.paymentMode}
+                            <span className="text-[11px] text-muted-foreground truncate">
+                              {tx.notes}
                             </span>
                           )}
-                        </td>
-                        <td className="py-3 px-4 whitespace-nowrap">
-                          {isIncome ? (
-                            <Badge variant="success" className="text-[10px]">
-                              Income
-                            </Badge>
-                          ) : isTransfer ? (
-                            <Badge variant="secondary" className="text-[10px]">
-                              Transfer
-                            </Badge>
-                          ) : (
-                            <Badge variant="destructive" className="text-[10px]">
-                              Expense
-                            </Badge>
-                          )}
-                        </td>
-                        <td className={`py-3 px-4 whitespace-nowrap text-right font-bold text-sm ${
-                          isIncome
-                            ? "text-emerald-600 dark:text-emerald-400"
-                            : isTransfer
-                            ? "text-sky-600 dark:text-sky-400"
-                            : "text-foreground"
-                        }`}>
-                          {isIncome ? "+" : isTransfer ? "" : "-"}
-                          {formatPaiseToINR(tx.amountPaise)}
-                        </td>
-                        <td className="py-3 px-4 whitespace-nowrap text-right">
-                          <button
-                            onClick={() => handleDeleteTransaction(tx._id!.toString())}
-                            className="p-1 rounded text-muted-foreground hover:text-rose-600 transition-colors"
-                            title="Delete transaction"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                        </div>
+                        <button
+                          onClick={() => handleDeleteTransaction(tx._id!.toString())}
+                          className="p-1.5 rounded-md text-muted-foreground hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors shrink-0"
+                          title="Delete transaction"
+                          aria-label="Delete transaction"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Desktop / Tablet Table (hidden sm:block) */}
+              <div className="hidden sm:block overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-muted/50 border-b border-border text-muted-foreground font-medium uppercase tracking-wider">
+                    <tr>
+                      <th className="py-3 px-4">Date</th>
+                      <th className="py-3 px-4">Description</th>
+                      <th className="py-3 px-4">Account / Mode</th>
+                      <th className="py-3 px-4">Type</th>
+                      <th className="py-3 px-4 text-right">Amount</th>
+                      <th className="py-3 px-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {transactions.map((tx) => {
+                      const isIncome = tx.type === "income";
+                      const isTransfer = tx.type === "transfer";
+                      const dateFormatted = new Date(tx.transactionDate).toLocaleDateString("en-IN", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      });
+
+                      return (
+                        <tr key={tx._id?.toString()} className="hover:bg-muted/30 transition-colors">
+                          <td className="py-3 px-4 whitespace-nowrap font-medium text-foreground">
+                            {dateFormatted}
+                          </td>
+                          <td className="py-3 px-4">
+                            <div className="font-semibold text-foreground">{tx.description}</div>
+                            {tx.categoryName && (
+                              <Badge variant="outline" className="text-[10px] mt-0.5">
+                                {tx.categoryName}
+                              </Badge>
+                            )}
+                            {tx.notes && (
+                              <p className="text-[11px] text-muted-foreground mt-0.5">{tx.notes}</p>
+                            )}
+                          </td>
+                          <td className="py-3 px-4 whitespace-nowrap text-muted-foreground">
+                            <div>{tx.accountName || "Unassigned"}</div>
+                            {tx.paymentMode && (
+                              <span className="text-[10px] uppercase font-medium text-primary">
+                                {tx.paymentMode}
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-3 px-4 whitespace-nowrap">
+                            {isIncome ? (
+                              <Badge variant="success" className="text-[10px]">
+                                Income
+                              </Badge>
+                            ) : isTransfer ? (
+                              <Badge variant="secondary" className="text-[10px]">
+                                Transfer
+                              </Badge>
+                            ) : (
+                              <Badge variant="destructive" className="text-[10px]">
+                                Expense
+                              </Badge>
+                            )}
+                          </td>
+                          <td className={`py-3 px-4 whitespace-nowrap text-right font-bold text-sm ${
+                            isIncome
+                              ? "text-emerald-600 dark:text-emerald-400"
+                              : isTransfer
+                              ? "text-sky-600 dark:text-sky-400"
+                              : "text-foreground"
+                          }`}>
+                            {isIncome ? "+" : isTransfer ? "" : "-"}
+                            {formatPaiseToINR(tx.amountPaise)}
+                          </td>
+                          <td className="py-3 px-4 whitespace-nowrap text-right">
+                            <button
+                              onClick={() => handleDeleteTransaction(tx._id!.toString())}
+                              className="p-1 rounded text-muted-foreground hover:text-rose-600 transition-colors"
+                              title="Delete transaction"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
 
           {/* Pagination Controls */}
           {pagination.totalPages > 1 && (
-            <div className="flex items-center justify-between p-4 border-t border-border text-xs text-muted-foreground">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 border-t border-border text-xs text-muted-foreground">
               <span>
                 Showing page {pagination.page} of {pagination.totalPages} ({pagination.totalCount} entries)
               </span>

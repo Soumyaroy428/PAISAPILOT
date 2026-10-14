@@ -191,13 +191,13 @@ export default function CategoriesPage() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center space-x-3">
+        <div className="flex flex-wrap items-center gap-2">
           <Button
             variant="outline"
             size="sm"
             onClick={handleRunAutoCategorization}
             disabled={autoCategorizing}
-            className="font-semibold shadow-sm text-xs"
+            className="font-semibold shadow-sm text-xs h-8"
           >
             {autoCategorizing ? (
               <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
@@ -210,7 +210,7 @@ export default function CategoriesPage() {
           <Button
             size="sm"
             onClick={() => setShowAddModal(true)}
-            className="font-semibold shadow-sm text-xs"
+            className="font-semibold shadow-sm text-xs h-8"
           >
             <PlusCircle className="mr-1.5 h-3.5 w-3.5" /> Add Category
           </Button>
@@ -339,10 +339,10 @@ export default function CategoriesPage() {
 
       {/* Search and Filters */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 overflow-x-auto no-scrollbar pb-1">
           <button
             onClick={() => setActiveTab("all")}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+            className={`shrink-0 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
               activeTab === "all"
                 ? "bg-primary text-primary-foreground"
                 : "bg-muted text-muted-foreground hover:text-foreground"
@@ -352,7 +352,7 @@ export default function CategoriesPage() {
           </button>
           <button
             onClick={() => setActiveTab("expense")}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+            className={`shrink-0 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
               activeTab === "expense"
                 ? "bg-primary text-primary-foreground"
                 : "bg-muted text-muted-foreground hover:text-foreground"
@@ -362,7 +362,7 @@ export default function CategoriesPage() {
           </button>
           <button
             onClick={() => setActiveTab("income")}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+            className={`shrink-0 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
               activeTab === "income"
                 ? "bg-primary text-primary-foreground"
                 : "bg-muted text-muted-foreground hover:text-foreground"

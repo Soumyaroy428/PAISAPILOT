@@ -147,12 +147,12 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 dark:text-emerald-300 flex items-center justify-between">
+          <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 dark:text-emerald-300 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div className="flex items-center space-x-2">
               <ShieldCheck className="h-4 w-4 text-emerald-500 shrink-0" />
               <span>Session Authenticated via Secure HttpOnly Cookie (AES-256 JWT)</span>
             </div>
-            <Badge variant="outline" className="text-[10px] bg-emerald-500/10 text-emerald-600 border-emerald-500/30">
+            <Badge variant="outline" className="text-[10px] bg-emerald-500/10 text-emerald-600 border-emerald-500/30 self-start sm:self-auto">
               Active
             </Badge>
           </div>

@@ -250,13 +250,13 @@ export default function BudgetsPage() {
         </div>
 
         {/* Global Action CTAs */}
-        <div className="flex items-center space-x-2.5">
+        <div className="flex flex-wrap items-center gap-2">
           <Button
             variant="outline"
             size="sm"
             onClick={handleEvaluateAlerts}
             disabled={actionLoading}
-            className="text-xs font-semibold"
+            className="text-xs font-semibold h-8"
           >
             <Bell className="mr-1.5 h-3.5 w-3.5 text-amber-500" />
             Check Alerts {unreadCount > 0 && `(${unreadCount})`}
@@ -266,7 +266,7 @@ export default function BudgetsPage() {
             <Button
               size="sm"
               onClick={() => setShowAddBudget(true)}
-              className="text-xs font-semibold shadow-xs"
+              className="text-xs font-semibold shadow-xs h-8"
             >
               <PlusCircle className="mr-1.5 h-3.5 w-3.5" /> New Budget
             </Button>
@@ -276,7 +276,7 @@ export default function BudgetsPage() {
             <Button
               size="sm"
               onClick={() => setShowAddRecurring(true)}
-              className="text-xs font-semibold shadow-xs"
+              className="text-xs font-semibold shadow-xs h-8"
             >
               <PlusCircle className="mr-1.5 h-3.5 w-3.5" /> Add Bill
             </Button>
@@ -297,11 +297,11 @@ export default function BudgetsPage() {
         </div>
       )}
 
-      {/* Navigation Tabs */}
-      <div className="flex items-center space-x-2 border-b border-border pb-2">
+      {/* Navigation Tabs (Touch-friendly & Horizontal Scrolling on Mobile) */}
+      <div className="flex items-center space-x-2 border-b border-border pb-2 overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
         <button
           onClick={() => setActiveTab("budgets")}
-          className={`flex items-center px-4 py-2 text-xs font-semibold rounded-lg transition-colors ${
+          className={`shrink-0 whitespace-nowrap flex items-center px-3.5 py-2 text-xs font-semibold rounded-lg transition-colors ${
             activeTab === "budgets"
               ? "bg-primary text-primary-foreground"
               : "text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -312,7 +312,7 @@ export default function BudgetsPage() {
 
         <button
           onClick={() => setActiveTab("recurring")}
-          className={`flex items-center px-4 py-2 text-xs font-semibold rounded-lg transition-colors ${
+          className={`shrink-0 whitespace-nowrap flex items-center px-3.5 py-2 text-xs font-semibold rounded-lg transition-colors ${
             activeTab === "recurring"
               ? "bg-primary text-primary-foreground"
               : "text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -328,7 +328,7 @@ export default function BudgetsPage() {
 
         <button
           onClick={() => setActiveTab("notifications")}
-          className={`flex items-center px-4 py-2 text-xs font-semibold rounded-lg transition-colors ${
+          className={`shrink-0 whitespace-nowrap flex items-center px-3.5 py-2 text-xs font-semibold rounded-lg transition-colors ${
             activeTab === "notifications"
               ? "bg-primary text-primary-foreground"
               : "text-muted-foreground hover:text-foreground hover:bg-muted"

@@ -234,8 +234,8 @@ export default function AssistantPage() {
       )}
 
       {/* Chat Area */}
-      <Card className="border-border shadow-sm min-h-[500px] flex flex-col justify-between">
-        <CardContent className="p-4 sm:p-6 space-y-6 flex-1 overflow-y-auto max-h-[600px]">
+      <Card className="border-border shadow-sm min-h-[420px] sm:min-h-[500px] flex flex-col justify-between">
+        <CardContent className="p-3.5 sm:p-6 space-y-4 sm:space-y-6 flex-1 overflow-y-auto max-h-[60dvh] sm:max-h-[600px]">
           {messages.length === 0 ? (
             <div className="py-12 text-center space-y-5">
               <div className="h-14 w-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto shadow-sm">
@@ -381,7 +381,7 @@ export default function AssistantPage() {
               onChange={(e) => setInputPrompt(e.target.value)}
               placeholder="Ask anything (e.g. 'Can I buy a ₹12,000 phone?', 'Where did my salary go?')..."
               disabled={loading}
-              className="flex-1 rounded-xl border border-input bg-background px-4 py-2.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
+              className="flex-1 rounded-xl border border-input bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
             />
             <Button
               type="submit"

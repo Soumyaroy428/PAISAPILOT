@@ -236,7 +236,7 @@ export default function OnboardingPage() {
   return (
     <div className="min-h-[85vh] py-8 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
       {/* Top Header & Skip Option */}
-      <div className="flex items-center justify-between pb-6 border-b border-border mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-6 border-b border-border mb-8">
         <div>
           <div className="flex items-center space-x-2">
             <Badge variant="outline" className="text-xs font-semibold px-2 py-0.5">
@@ -244,14 +244,14 @@ export default function OnboardingPage() {
             </Badge>
             <span className="text-xs text-muted-foreground">Personalized Finance Setup</span>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground mt-1">
             Configure Your PaisaPilot Experience
           </h1>
         </div>
         <button
           onClick={handleSkip}
           disabled={loading}
-          className="text-xs text-muted-foreground hover:text-foreground font-medium underline underline-offset-4 disabled:opacity-50"
+          className="self-start sm:self-auto text-xs text-muted-foreground hover:text-foreground font-medium underline underline-offset-4 disabled:opacity-50"
         >
           Skip for now
         </button>
