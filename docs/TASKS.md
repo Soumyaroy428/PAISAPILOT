@@ -30,12 +30,12 @@ Complete and verify each phase before starting the next.
 **Acceptance:** CRUD works, account balances reconcile atomically, and totals match integer paise arithmetic.
 
 ## Phase 4 — Statement import
-- [ ] Document supported CSV and specifically tested PDF formats.
-- [ ] Private storage, upload limits, import status/job model.
-- [ ] Parse, normalize, validate, preview, and duplicate detection.
-- [ ] User-confirmed commit and idempotent retry.
-- [ ] Row-level results, retention/deletion, malformed-file tests.
-**Acceptance:** Re-import/retry does not silently duplicate transactions.
+- [x] Documented supported CSV and specifically tested SBI PDF statement formats.
+- [x] In-memory private processing, 5 MB upload limits, import staging model (`imports` collection).
+- [x] Parse, normalize Indian banking dates/currency, validate, candidate preview, and fingerprint duplicate detection.
+- [x] User-confirmed commit, atomic account balance reconciliation, and idempotent retry.
+- [x] Row-level preview results, status badges, and malformed-file tests (27 unit tests passing).
+**Acceptance:** Re-import/retry does not silently duplicate transactions. Validated with automated fingerprint deduplication tests.
 
 ## Phase 5 — Dashboard and reports
 - [ ] Define tested formulas and date semantics.

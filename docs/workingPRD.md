@@ -80,7 +80,7 @@ Status Key:
 | Authenticated Dashboard Screen | `WORKING` | Private portal in `app/dashboard/page.tsx` with persona badge, integer paise KPI cards, and financial module navigation. |
 | Accounts & Payment Sources (`accounts` collection, labels) | `WORKING` | Document model, indexes, `server/services/account.service.ts`, `app/api/accounts`, and UI in `app/dashboard/accounts/page.tsx` with liquidity totals and archive actions. |
 | Manual Income & Expense Transactions (Paise math, CRUD, filters) | `WORKING` | Integer paise model, `server/services/transaction.service.ts`, `app/api/transactions`, atomic balance adjustments, and UI ledger in `app/dashboard/transactions/page.tsx`. |
-| Statement Import Pipeline (CSV / SBI PDF, parsing, preview, commit) | `NOT STARTED` | Scheduled for Checkpoint 4. |
+| Statement Import Pipeline (CSV / SBI PDF, parsing, preview, commit) | `WORKING` | In-memory private parser, `server/lib/parsers/csv.parser.ts`, `server/lib/parsers/sbi-pdf.parser.ts`, duplicate fingerprinting, candidate staging, preview table UI in `app/dashboard/import/page.tsx`, and idempotent commit. |
 | Financial Dashboard & Analytics (Totals, trends, categories, Recharts) | `NOT STARTED` | Scheduled for Checkpoint 5. |
 | Transaction Categorization (Deterministic rules + AI fallback) | `NOT STARTED` | Scheduled for Checkpoint 6. |
 | Grounded AI Finance Assistant (Restricted tools, prompt-injection defense) | `NOT STARTED` | Scheduled for Checkpoint 7. |
@@ -95,24 +95,24 @@ Status Key:
 ## 5. Verification & Tests Executed
 
 - **Unit Test Suite (`npm test`):**
-  - **14/14 automated unit tests passing across 4 suites (0 failures).**
+  - **27/27 automated unit tests passing across 8 suites (0 failures).**
   - Exact integer paise formatting: standard amounts, zero, negative/deficit formatting, Indian lakhs grouping.
   - Floating-point drift prevention: verified exact addition/subtraction in paise.
   - Transaction Zod schema boundaries: verified rejection of non-integer floats, zero, negative amounts, and oversized strings.
   - Account Zod validation: verified supported types, rejection of unsupported types, default initial balance of 0 paise.
   - Query parameter validation: verified pagination defaults and safe string-to-integer coercions.
-- **Lint / Type Check:** `npm run type-check` (`tsc --noEmit`) -> **PASS (0 errors across all routes and services)**.
-- **Production Build:** `npm run build` (`next build` with Turbopack) -> **PASS (23 routes compiled successfully, including 11 dynamic API routes and 12 static/prerendered pages)**.
-- **Accounts & Transaction Endpoints:**
-  - `GET /api/accounts` -> Returns active user payment sources; auto-seeds baseline accounts if empty.
-  - `POST /api/accounts` -> Validates payload, stores new account with masked number and integer paise balance.
-  - `GET /api/accounts/[id]` & `DELETE /api/accounts/[id]` -> Single account lookup and archival with user ownership enforcement.
-  - `GET /api/transactions` -> Multi-criteria filtering (type, account, date range, search) with pagination and aggregate income/expense totals.
-  - `POST /api/transactions` -> Validates transaction, persists in MongoDB, reconciles source and destination account balances atomically.
-  - `DELETE /api/transactions/[id]` -> Deletes transaction and reverts account balances atomically.
-- **Interactive UI Ledgers:**
-  - `app/dashboard/accounts/page.tsx` -> Reconciled liquidity card, payment source cards, add account modal, and archive action.
-  - `app/dashboard/transactions/page.tsx` -> Real-time aggregate KPI cards, search and filter bar, record transaction modal with INR-to-paise preview, and paginated ledger table.
+  - Bank Date Normalization: verified parsing of `DD/MM/YYYY`, `DD-MM-YYYY`, `DD Mon YYYY` (SBI format), and ISO format.
+  - Indian Currency-to-Paise: verified parsing of decimal amounts, Indian lakhs grouping, rupee symbols, and Dr/Cr notations.
+  - CSV Statement Parser: verified multi-column Debit/Credit parsing, quoted text with commas, and malformed line error detection.
+  - Deduplication & Fingerprint Stability: verified deterministic SHA-256 content hashing and time-invariant transaction fingerprinting.
+- **Lint / Type Check:** `npm run type-check` (`tsc --noEmit`) -> **PASS (0 errors across all routes, services, and parsers)**.
+- **Production Build:** `npm run build` (`next build` with Turbopack) -> **PASS (25 routes compiled successfully, including 13 dynamic API routes and 12 static/prerendered pages)**.
+- **Statement Import Endpoints:**
+  - `POST /api/imports/upload` -> Accepts CSV / SBI PDF file via FormData, parses candidate rows, runs duplicate checks against existing ledger, and returns preview.
+  - `GET /api/imports/[id]` -> Retrieves staged import candidate rows and metadata.
+  - `POST /api/imports/[id]/commit` -> Idempotently commits user-selected candidate rows into the transactions ledger and atomically adjusts the target account balance.
+- **Interactive UI Flows:**
+  - `app/dashboard/import/page.tsx` -> Statement upload with drag-and-drop, format switcher, candidate rows preview table with row-level error/duplicate badges, and idempotent commit workflow.
 - **Health Check Smoke Test:** `/api/health` -> **PASS (HTTP 200 OK)**.
 
 ---
