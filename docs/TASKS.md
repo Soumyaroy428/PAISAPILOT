@@ -23,11 +23,11 @@ Complete and verify each phase before starting the next.
 **Acceptance:** Private data is inaccessible without authorization. Onboarding dynamically seeds 5 persona archetypes.
 
 ## Phase 3 — Accounts and manual transactions
-- [ ] Account/payment-source model and indexes.
-- [ ] Transaction CRUD, validation, filters, search, pagination.
-- [ ] Exact INR money handling and shared formatting.
-- [ ] Tests for income, expense, transfer, refund, zero, and dates.
-**Acceptance:** CRUD works and totals match fixtures.
+- [x] Account/payment-source model, Zod validation, and MongoDB indexes (`accounts`, `transactions`).
+- [x] Transaction CRUD, validation, filters (type, account, date range), search, pagination.
+- [x] Exact INR money handling in integer paise (`amountPaise`) and shared formatting (`formatPaiseToINR`).
+- [x] Tests for income, expense, transfer, zero, negative/float rejection, and large lakh formats (14 automated tests passing).
+**Acceptance:** CRUD works, account balances reconcile atomically, and totals match integer paise arithmetic.
 
 ## Phase 4 — Statement import
 - [ ] Document supported CSV and specifically tested PDF formats.

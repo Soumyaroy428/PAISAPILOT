@@ -1,4 +1,5 @@
-import { MongoClient, Db, Collection, Document } from "mongodb";
+import { MongoClient, Db, Collection } from "mongodb";
+import type { Document } from "mongodb";
 
 const uri = process.env.MONGODB_URI;
 
@@ -91,6 +92,26 @@ export async function ensureDatabaseIndexes(): Promise<void> {
     // 3. Budgets indexes
     await db.collection("budgets").createIndex(
       { userId: 1, periodStart: 1, categoryId: 1 },
+      { background: true }
+    );
+
+    // 4. Accounts indexes
+    await db.collection("accounts").createIndex(
+      { userId: 1, isArchived: 1 },
+      { background: true }
+    );
+
+    // 5. Transactions indexes
+    await db.collection("transactions").createIndex(
+      { userId: 1, transactionDate: -1 },
+      { background: true }
+    );
+    await db.collection("transactions").createIndex(
+      { userId: 1, type: 1 },
+      { background: true }
+    );
+    await db.collection("transactions").createIndex(
+      { userId: 1, accountId: 1 },
       { background: true }
     );
 

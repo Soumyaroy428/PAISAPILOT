@@ -11,7 +11,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test": "tsx --test tests/money-and-models.test.ts"
   },
   "repository": {
     "type": "git",
@@ -45,6 +46,7 @@
     "autoprefixer": "^10.6.1",
     "postcss": "^8.5.30",
     "tailwindcss": "^3.4.19",
+    "tsx": "^4.23.15",
     "typescript": "^7.0.2"
   }
 }

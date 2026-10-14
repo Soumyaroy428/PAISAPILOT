@@ -1,5 +1,6 @@
 import { z } from "zod";
-import { ObjectId, Document } from "mongodb";
+import { ObjectId } from "mongodb";
+import type { Document } from "mongodb";
 
 export type PersonaType =
   | "student"
