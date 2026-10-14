@@ -24,6 +24,8 @@ import {
   CheckCircle2,
   ArrowRight,
   Tag,
+  Target,
+  Bell,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -184,6 +186,11 @@ export default function DashboardPage() {
           <Link href="/dashboard/assistant">
             <Button size="sm" variant="outline" className="font-semibold text-xs border-primary/30 text-primary hover:bg-primary/5 shadow-2xs">
               <Sparkles className="mr-1.5 h-3.5 w-3.5" /> AI Copilot
+            </Button>
+          </Link>
+          <Link href="/dashboard/budgets">
+            <Button size="sm" variant="outline" className="font-semibold text-xs border-border text-foreground hover:bg-muted shadow-2xs">
+              <Target className="mr-1.5 h-3.5 w-3.5 text-rose-500" /> Budgets &amp; Bills
             </Button>
           </Link>
           <Link href="/dashboard/transactions">
@@ -494,7 +501,7 @@ export default function DashboardPage() {
       {/* Financial Management Portals */}
       <div className="space-y-3">
         <h2 className="text-lg font-semibold text-foreground">Financial Management Modules</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {/* Module 1: Transactions Ledger */}
           <Card className="border-border hover:border-foreground/30 transition-all shadow-sm">
             <CardHeader className="pb-2">
@@ -567,7 +574,25 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          {/* Module 5: Reports & Analytics */}
+          {/* Module 5: Budgets, Recurring & Alerts */}
+          <Card className="border-border hover:border-foreground/30 transition-all shadow-sm">
+            <CardHeader className="pb-2">
+              <div className="flex items-center space-x-2">
+                <div className="p-2 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400">
+                  <Target className="h-4 w-4" />
+                </div>
+                <CardTitle className="text-sm font-semibold">Budgets &amp; Bills</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-2 text-xs text-muted-foreground">
+              <p>Monthly spending caps, subscription detection, and alert center.</p>
+              <Link href="/dashboard/budgets" className="inline-block text-primary font-semibold hover:underline">
+                Manage Budgets &rarr;
+              </Link>
+            </CardContent>
+          </Card>
+
+          {/* Module 6: Reports & Analytics */}
           <Card className="border-border hover:border-foreground/30 transition-all shadow-sm">
             <CardHeader className="pb-2">
               <div className="flex items-center space-x-2">
@@ -585,7 +610,7 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          {/* Module 6: Grounded AI Assistant */}
+          {/* Module 7: Grounded AI Assistant */}
           <Card className="border-border hover:border-foreground/30 transition-all shadow-sm">
             <CardHeader className="pb-2">
               <div className="flex items-center space-x-2">

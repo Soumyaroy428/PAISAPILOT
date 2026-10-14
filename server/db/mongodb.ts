@@ -115,6 +115,22 @@ export async function ensureDatabaseIndexes(): Promise<void> {
       { background: true }
     );
 
+    // 6. Recurring indexes
+    await db.collection("recurring").createIndex(
+      { userId: 1, status: 1 },
+      { background: true }
+    );
+
+    // 7. Notifications indexes (fingerprint uniqueness guarantees idempotent alerts)
+    await db.collection("notifications").createIndex(
+      { userId: 1, fingerprint: 1 },
+      { unique: true, background: true }
+    );
+    await db.collection("notifications").createIndex(
+      { userId: 1, isRead: 1, createdAt: -1 },
+      { background: true }
+    );
+
     indexesInitialized = true;
   } catch (error) {
     console.error("Warning: Could not initialize database indexes:", error);

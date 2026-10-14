@@ -83,8 +83,7 @@ Status Key:
 | Statement Import Pipeline (CSV / SBI PDF, parsing, preview, commit) | `WORKING` | In-memory private parser, `server/lib/parsers/csv.parser.ts`, `server/lib/parsers/sbi-pdf.parser.ts`, duplicate fingerprinting, candidate staging, preview table UI in `app/dashboard/import/page.tsx`, and idempotent commit. |
 | Financial Dashboard & Analytics (Totals, trends, categories, Recharts) | `WORKING` | Single source of truth calculation engine in `server/services/analytics.service.ts`, Recharts visualizer, accessible table toggle, category matrix, and deep-dive reports in `app/dashboard/reports/page.tsx`. |
 | Transaction Categorization (Deterministic rules + AI fallback) | `WORKING` | Deterministic rule dictionary covering 100+ Indian merchants, default taxonomy auto-seeding, user customization, safe auto-categorization runner, and candidate preview badges. |
-| Grounded AI Finance Assistant (Restricted tools, prompt-injection defense) | `WORKING` | Bounded context generation, Gemini 3.8 Flash gateway with deterministic zero-hallucination fallback, prompt injection defense, affordability engine, and conversational UI. |
-| Budgets, Recurring Payments & Notifications | `NOT STARTED` | Scheduled for Checkpoint 8. |
+| Budgets, Recurring Payments & Notifications | `WORKING` | Document models, indexes, budget progress calculator with status progression, recurring candidate auto-detection, period-fingerprinted idempotent notifications, and 3-tab portal in `app/dashboard/budgets/page.tsx`. |
 | Cash-Flow Forecasting & Insights | `NOT STARTED` | Scheduled for Checkpoint 9. |
 | Privacy Controls, Data Export & Account Deletion | `WORKING` | Secure CSV and JSON export engine (`server/services/export.service.ts` + `/api/analytics/export`) with CSV injection protection; privacy policy live. |
 | Production Hardening & CI/CD | `NOT STARTED` | Next.js production build passes locally; CI/CD scheduled for Checkpoint 10. |
@@ -95,7 +94,11 @@ Status Key:
 ## 5. Verification & Tests Executed
 
 - **Unit Test Suite (`npm test`):**
-  - **78/78 automated unit tests passing across 17 suites (0 failures).**
+  - **96/96 automated unit tests passing across 20 suites (0 failures).**
+  - Budget Validation & Progress Logic: verified `CreateBudgetSchema` (positive INR amount, default 85% threshold, 50-100% threshold boundaries), `UpdateBudgetSchema` partial updates, and integer paise utilization with status transitions (`normal`, `warning` at 85%, `exceeded` >100% with clamped 0 remaining).
+  - Recurring Payments & Subscriptions: verified `CreateRecurringSchema` (frequencies: monthly, quarterly, yearly, weekly; ISO YYYY-MM-DD date validation), status transitions (`candidate`, `active`, `paused`, `dismissed`), and next expected due date projection into the future.
+  - Recurring Merchant Detection Heuristics: verified identification of common Indian subscriptions (Netflix, Spotify, Bescom, Zerodha SIP, Rent).
+  - Idempotent Notification Fingerprinting: verified deterministic SHA/composite period keys (`budget_${userId}_${catName}_${YYYY_MM}_warning` / `exceeded` and `recurring_${userId}_${ruleId}_${dueDate}`) preventing duplicate alert spam across cycles.
   - AI Prompt Sanitization & Injection Defense: verified stripping of prompt override phrases (`ignore previous instructions`, `system prompt`), HTML/XML tags, and 800-char truncation boundary.
   - Intent Detection: verified classification across 5 supported intents (`affordability_query`, `spending_breakdown`, `savings_optimization`, `financial_summary`, `general_inquiry`).
   - Rupee Monetary Extraction: verified exact parsing of `₹15,000`, `Rs 2,500`, `1.5 lakh`, `25k`, and raw amounts.
@@ -117,7 +120,15 @@ Status Key:
   - Single Source of Truth Financial Calculation: verified internal transfers exclusion from P&L, savings rate calculation with zero-income and deficit defense.
   - CSV Formula Injection Defense: verified neutralization of dangerous spreadsheet formula prefixes (`=`, `+`, `-`, `@`) and RFC quoting.
 - **Lint / Type Check:** `npm run type-check` (`tsc --noEmit`) -> **PASS (0 errors across all routes, services, charts, models, and parsers)**.
-- **Production Build:** `npm run build` (`next build` with Turbopack) -> **PASS (33 routes compiled successfully, including 19 dynamic API routes and 14 static/prerendered pages)**.
+- **Production Build:** `npm run build` (`next build` with Turbopack) -> **PASS (38 routes compiled successfully, including 24 dynamic API routes and 14 static/prerendered pages)**.
+- **Budgets, Recurring & Notification Endpoints:**
+  - `GET/POST /api/budgets` -> Aggregates active budgets with real-time monthly spending progress or creates custom category budget.
+  - `PATCH/DELETE /api/budgets/[id]` -> Partial updates and safe soft-delete archiving of budgets.
+  - `GET/POST /api/recurring` -> Retrieves active recurring rules and upcoming bills timeline or creates manual subscription.
+  - `POST /api/recurring/detect` -> Scans last 120 days of transactions to stage new subscription candidates without overwriting.
+  - `PATCH /api/recurring/[id]` -> Confirms, pauses, or dismisses subscription candidates.
+  - `GET/POST /api/notifications` -> Returns notification feed or triggers idempotent alert generation scan.
+  - `PATCH /api/notifications/[id]/read` -> Marks single notification or all user notifications as read.
 - **AI Assistant Endpoints:**
   - `POST /api/assistant/chat` -> Secure grounded AI conversational endpoint with prompt sanitization, intent classification, bounded facts injection, and Gemini / deterministic fallback execution.
 - **Categories & Intelligence Endpoints:**
@@ -129,12 +140,10 @@ Status Key:
   - `GET /api/analytics/dashboard` -> Aggregates real-time P&L metrics, category distributions, Recharts trend points, and data coverage scope.
   - `GET /api/analytics/export` -> Secure stream download of sanitized CSV and clean JSON transaction exports with date-range filters.
 - **Interactive UI Ledgers & Analytics:**
+  - `app/dashboard/budgets/page.tsx` -> 3-tab financial controls center: Monthly Budgets (progress bars, status badges, modal), Recurring Subscriptions & Bills (upcoming bills timeline, detected candidates review, rules table), and Idempotent Notifications feed with mark-as-read actions.
+  - `app/dashboard/page.tsx` -> Recharts Cash Flow Inflows vs Outflows visualization, accessible tabular view toggle, budget threshold alert bar, Module 7 navigation card, and data coverage notice.
   - `app/dashboard/assistant/page.tsx` -> PaisaPilot Copilot portal with verified facts strip, quick prompt pills, markdown thread, suggested follow-ups, and copy actions.
   - `app/dashboard/categories/page.tsx` -> Interactive category taxonomy manager, color chips, custom category modal, and one-click auto-categorization runner.
-  - `app/dashboard/page.tsx` -> Recharts Cash Flow Inflows vs Outflows visualization, accessible tabular view toggle, budget threshold alert bar, and data coverage notice.
-  - `app/dashboard/reports/page.tsx` -> Full P&L breakdown, category expenditure matrix (count, total, average ticket size, % share), and self-serve export center.
-  - `app/dashboard/import/page.tsx` -> Statement import preview table showing auto-detected category badges next to staged candidate rows.
-  - `app/dashboard/page.tsx` -> Recharts Cash Flow Inflows vs Outflows visualization, accessible tabular view toggle, budget threshold alert bar, and data coverage notice.
   - `app/dashboard/reports/page.tsx` -> Full P&L breakdown, category expenditure matrix (count, total, average ticket size, % share), and self-serve export center.
   - `app/dashboard/import/page.tsx` -> Statement import preview table showing auto-detected category badges next to staged candidate rows.
 - **Health Check Smoke Test:** `/api/health` -> **PASS (HTTP 200 OK)**.

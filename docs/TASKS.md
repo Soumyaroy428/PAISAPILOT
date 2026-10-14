@@ -64,10 +64,13 @@ Complete and verify each phase before starting the next.
 **Acceptance:** AI cannot query the database arbitrarily or invent totals. All calculations strictly reference verified integer paise figures.
 
 ## Phase 8 — Budgets, recurring payments, notifications
-- [ ] Budget create/edit/archive and period calculations.
-- [ ] Thresholds and notification preferences.
-- [ ] Recurring rules and confirm/dismiss detected candidates.
-- [ ] Idempotent notification jobs; test time zones.
+- [x] Budget create/edit/archive and period calculations (`server/models/budget.ts` and `server/services/budget.service.ts`).
+- [x] Thresholds and notification preferences with status progression (normal, warning at 85%, exceeded >100%).
+- [x] Recurring rules and confirm/dismiss detected candidates (`server/models/recurring.ts` and `server/services/recurring.service.ts`).
+- [x] Idempotent notification jobs with period/date fingerprinting preventing duplicate spam (`server/models/notification.ts` and `server/services/notification.service.ts`).
+- [x] API endpoints: `GET/POST /api/budgets`, `PATCH/DELETE /api/budgets/[id]`, `GET/POST /api/recurring`, `POST /api/recurring/detect`, `PATCH /api/recurring/[id]`, `GET/POST /api/notifications`, `PATCH /api/notifications/[id]/read`.
+- [x] Comprehensive 3-tab UI in `app/dashboard/budgets/page.tsx` and Module 7 navigation card in `app/dashboard/page.tsx`.
+- [x] Automated test suite in `tests/budgets-and-recurring.test.ts` (96 total passing tests across 20 test blocks).
 **Acceptance:** No duplicate alerts; calculations match documented rules.
 
 ## Phase 9 — Forecasting and insights
