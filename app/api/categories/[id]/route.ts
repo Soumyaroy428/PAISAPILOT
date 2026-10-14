@@ -103,3 +103,4 @@ export async function DELETE(
 
   return NextResponse.json({ data: { message: "Category archived successfully." } });
 }
+

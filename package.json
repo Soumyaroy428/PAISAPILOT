@@ -12,7 +12,7 @@
     "build": "next build",
     "start": "next start",
     "type-check": "tsc --noEmit",
-    "test": "tsx --test tests/money-and-models.test.ts tests/statement-parser.test.ts tests/analytics.test.ts tests/categorization.test.ts"
+    "test": "tsx --test tests/money-and-models.test.ts tests/statement-parser.test.ts tests/analytics.test.ts tests/categorization.test.ts tests/assistant.test.ts"
   },
   "repository": {
     "type": "git",
@@ -27,6 +27,7 @@
   },
   "homepage": "https://github.com/Soumyaroy428/PAISAPILOT#readme",
   "dependencies": {
+    "@google/genai": "^2.29.1",
     "bcryptjs": "^3.0.3",
     "clsx": "^2.1.1",
     "jose": "^6.2.12",

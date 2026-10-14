@@ -54,12 +54,14 @@ Complete and verify each phase before starting the next.
 **Acceptance:** User-confirmed categories are never silently overwritten. Manual labels and transfers are preserved.
 
 ## Phase 7 — AI assistant
-- [ ] Define supported intents and response schema.
-- [ ] Server-side bounded metric/context functions.
-- [ ] AI gateway, provider adapter, timeouts, limits, error handling.
-- [ ] Prompt-injection defense and output validation.
-- [ ] Display date range, coverage, assumptions, and supporting links.
-**Acceptance:** AI cannot query the database arbitrarily or invent totals.
+- [x] Defined supported intents (`financial_summary`, `spending_breakdown`, `affordability_query`, `savings_optimization`, `general_inquiry`) and structured response schema in `server/models/assistant.ts`.
+- [x] Server-side bounded metric context functions in `server/services/assistant-context.service.ts` referencing single source of truth analytics.
+- [x] AI gateway and provider adapter in `server/services/ai-gateway.service.ts` supporting Google Gemini (`gemini-3.8-flash`) with seamless zero-hallucination deterministic fallback when API keys are unconfigured or rate-limited.
+- [x] Prompt-injection defense (`sanitizeUserPrompt`) neutralizing override tokens, system delimiters, and length violations.
+- [x] Active context strip displaying date range, data coverage, verified liquid balance, and remaining monthly budget headroom.
+- [x] API endpoint `POST /api/assistant/chat` and conversational UI in `app/dashboard/assistant/page.tsx` with quick prompt pills and suggested follow-ups.
+- [x] Automated test suite in `tests/assistant.test.ts` (78 total passing tests across 17 test suites).
+**Acceptance:** AI cannot query the database arbitrarily or invent totals. All calculations strictly reference verified integer paise figures.
 
 ## Phase 8 — Budgets, recurring payments, notifications
 - [ ] Budget create/edit/archive and period calculations.

@@ -180,15 +180,20 @@ export default function DashboardPage() {
         </div>
 
         {/* Global Action CTAs */}
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2 sm:space-x-3">
+          <Link href="/dashboard/assistant">
+            <Button size="sm" variant="outline" className="font-semibold text-xs border-primary/30 text-primary hover:bg-primary/5 shadow-2xs">
+              <Sparkles className="mr-1.5 h-3.5 w-3.5" /> AI Copilot
+            </Button>
+          </Link>
           <Link href="/dashboard/transactions">
-            <Button size="sm" className="font-semibold shadow-sm">
-              <PlusCircle className="mr-1.5 h-4 w-4" /> Add Transaction
+            <Button size="sm" className="font-semibold shadow-sm text-xs">
+              <PlusCircle className="mr-1.5 h-3.5 w-3.5" /> Add Txn
             </Button>
           </Link>
           <a href="/api/analytics/export?format=csv" download>
             <Button variant="outline" size="sm" className="font-semibold text-xs">
-              <Download className="mr-1.5 h-3.5 w-3.5" /> Export CSV
+              <Download className="mr-1.5 h-3.5 w-3.5" /> Export
             </Button>
           </a>
           <Button
@@ -576,6 +581,24 @@ export default function DashboardPage() {
               <p>Monthly P&amp;L, spending trends, and secure CSV/JSON export center.</p>
               <Link href="/dashboard/reports" className="inline-block text-primary font-semibold hover:underline">
                 View Reports &rarr;
+              </Link>
+            </CardContent>
+          </Card>
+
+          {/* Module 6: Grounded AI Assistant */}
+          <Card className="border-border hover:border-foreground/30 transition-all shadow-sm">
+            <CardHeader className="pb-2">
+              <div className="flex items-center space-x-2">
+                <div className="p-2 rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400">
+                  <Bot className="h-4 w-4" />
+                </div>
+                <CardTitle className="text-sm font-semibold">AI Copilot</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-2 text-xs text-muted-foreground">
+              <p>Affordability check, savings insights, and grounded financial intelligence.</p>
+              <Link href="/dashboard/assistant" className="inline-block text-primary font-semibold hover:underline">
+                Ask Copilot &rarr;
               </Link>
             </CardContent>
           </Card>
