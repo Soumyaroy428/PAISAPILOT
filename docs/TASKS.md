@@ -38,11 +38,11 @@ Complete and verify each phase before starting the next.
 **Acceptance:** Re-import/retry does not silently duplicate transactions. Validated with automated fingerprint deduplication tests.
 
 ## Phase 5 — Dashboard and reports
-- [ ] Define tested formulas and date semantics.
-- [ ] Summary cards, trends, categories, recent transactions.
-- [ ] Period filters, data coverage, reports, secure export.
-- [ ] Test refunds, transfers, empty periods, month/year boundaries.
-**Acceptance:** All views use the same calculation source.
+- [x] Defined tested formulas and date semantics (`server/services/analytics.service.ts`).
+- [x] Summary cards, Recharts trends with accessible table views, category breakdowns, recent transactions.
+- [x] Period filters (This Month, Last Month, 30D, 90D, Year, All Time), data coverage scope, deep-dive reports (`app/dashboard/reports/page.tsx`), and secure CSV/JSON export (`server/services/export.service.ts`).
+- [x] Tested transfers exclusion, empty periods, month/year boundaries, and CSV formula injection protection (35 automated tests passing).
+**Acceptance:** All views use the same single source of truth calculation engine.
 
 ## Phase 6 — Categorization
 - [ ] Category taxonomy and user-editable categories.

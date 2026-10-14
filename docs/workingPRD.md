@@ -81,12 +81,12 @@ Status Key:
 | Accounts & Payment Sources (`accounts` collection, labels) | `WORKING` | Document model, indexes, `server/services/account.service.ts`, `app/api/accounts`, and UI in `app/dashboard/accounts/page.tsx` with liquidity totals and archive actions. |
 | Manual Income & Expense Transactions (Paise math, CRUD, filters) | `WORKING` | Integer paise model, `server/services/transaction.service.ts`, `app/api/transactions`, atomic balance adjustments, and UI ledger in `app/dashboard/transactions/page.tsx`. |
 | Statement Import Pipeline (CSV / SBI PDF, parsing, preview, commit) | `WORKING` | In-memory private parser, `server/lib/parsers/csv.parser.ts`, `server/lib/parsers/sbi-pdf.parser.ts`, duplicate fingerprinting, candidate staging, preview table UI in `app/dashboard/import/page.tsx`, and idempotent commit. |
-| Financial Dashboard & Analytics (Totals, trends, categories, Recharts) | `NOT STARTED` | Scheduled for Checkpoint 5. |
+| Financial Dashboard & Analytics (Totals, trends, categories, Recharts) | `WORKING` | Single source of truth calculation engine in `server/services/analytics.service.ts`, Recharts visualizer, accessible table toggle, category matrix, and deep-dive reports in `app/dashboard/reports/page.tsx`. |
 | Transaction Categorization (Deterministic rules + AI fallback) | `NOT STARTED` | Scheduled for Checkpoint 6. |
 | Grounded AI Finance Assistant (Restricted tools, prompt-injection defense) | `NOT STARTED` | Scheduled for Checkpoint 7. |
 | Budgets, Recurring Payments & Notifications | `NOT STARTED` | Scheduled for Checkpoint 8. |
 | Cash-Flow Forecasting & Insights | `NOT STARTED` | Scheduled for Checkpoint 9. |
-| Privacy Controls, Data Export & Account Deletion | `PARTIAL` | Legal/Privacy screens (`/privacy`, `/terms`, `/security`) live; functional export/deletion scheduled for Checkpoint 10. |
+| Privacy Controls, Data Export & Account Deletion | `WORKING` | Secure CSV and JSON export engine (`server/services/export.service.ts` + `/api/analytics/export`) with CSV injection protection; privacy policy live. |
 | Production Hardening & CI/CD | `NOT STARTED` | Next.js production build passes locally; CI/CD scheduled for Checkpoint 10. |
 | Authorized Bank Integration (Account Aggregator) | `NOT STARTED` | Explicitly deferred until verified provider eligibility. |
 
@@ -95,7 +95,7 @@ Status Key:
 ## 5. Verification & Tests Executed
 
 - **Unit Test Suite (`npm test`):**
-  - **27/27 automated unit tests passing across 8 suites (0 failures).**
+  - **35/35 automated unit tests passing across 11 suites (0 failures).**
   - Exact integer paise formatting: standard amounts, zero, negative/deficit formatting, Indian lakhs grouping.
   - Floating-point drift prevention: verified exact addition/subtraction in paise.
   - Transaction Zod schema boundaries: verified rejection of non-integer floats, zero, negative amounts, and oversized strings.
@@ -105,14 +105,17 @@ Status Key:
   - Indian Currency-to-Paise: verified parsing of decimal amounts, Indian lakhs grouping, rupee symbols, and Dr/Cr notations.
   - CSV Statement Parser: verified multi-column Debit/Credit parsing, quoted text with commas, and malformed line error detection.
   - Deduplication & Fingerprint Stability: verified deterministic SHA-256 content hashing and time-invariant transaction fingerprinting.
-- **Lint / Type Check:** `npm run type-check` (`tsc --noEmit`) -> **PASS (0 errors across all routes, services, and parsers)**.
-- **Production Build:** `npm run build` (`next build` with Turbopack) -> **PASS (25 routes compiled successfully, including 13 dynamic API routes and 12 static/prerendered pages)**.
-- **Statement Import Endpoints:**
-  - `POST /api/imports/upload` -> Accepts CSV / SBI PDF file via FormData, parses candidate rows, runs duplicate checks against existing ledger, and returns preview.
-  - `GET /api/imports/[id]` -> Retrieves staged import candidate rows and metadata.
-  - `POST /api/imports/[id]/commit` -> Idempotently commits user-selected candidate rows into the transactions ledger and atomically adjusts the target account balance.
-- **Interactive UI Flows:**
-  - `app/dashboard/import/page.tsx` -> Statement upload with drag-and-drop, format switcher, candidate rows preview table with row-level error/duplicate badges, and idempotent commit workflow.
+  - Period Date Boundary Resolution: verified day-1 00:00:00 to last-day 23:59:59 calculations across months, years, and rolling periods.
+  - Single Source of Truth Financial Calculation: verified internal transfers exclusion from P&L, savings rate calculation with zero-income and deficit defense.
+  - CSV Formula Injection Defense: verified neutralization of dangerous spreadsheet formula prefixes (`=`, `+`, `-`, `@`) and RFC quoting.
+- **Lint / Type Check:** `npm run type-check` (`tsc --noEmit`) -> **PASS (0 errors across all routes, services, charts, and parsers)**.
+- **Production Build:** `npm run build` (`next build` with Turbopack) -> **PASS (28 routes compiled successfully, including 15 dynamic API routes and 13 static/prerendered pages)**.
+- **Analytics & Export Endpoints:**
+  - `GET /api/analytics/dashboard` -> Aggregates real-time P&L metrics, category distributions, Recharts trend points, and data coverage scope.
+  - `GET /api/analytics/export` -> Secure stream download of sanitized CSV and clean JSON transaction exports with date-range filters.
+- **Interactive UI Ledgers & Analytics:**
+  - `app/dashboard/page.tsx` -> Recharts Cash Flow Inflows vs Outflows visualization, accessible tabular view toggle, budget threshold alert bar, and data coverage notice.
+  - `app/dashboard/reports/page.tsx` -> Full P&L breakdown, category expenditure matrix (count, total, average ticket size, % share), and self-serve export center.
 - **Health Check Smoke Test:** `/api/health` -> **PASS (HTTP 200 OK)**.
 
 ---

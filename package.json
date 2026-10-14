@@ -12,7 +12,7 @@
     "build": "next build",
     "start": "next start",
     "type-check": "tsc --noEmit",
-    "test": "tsx --test tests/money-and-models.test.ts tests/statement-parser.test.ts"
+    "test": "tsx --test tests/money-and-models.test.ts tests/statement-parser.test.ts tests/analytics.test.ts"
   },
   "repository": {
     "type": "git",
@@ -35,6 +35,7 @@
     "next": "^16.3.4",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
+    "recharts": "^3.10.1",
     "tailwind-merge": "^3.7.0",
     "unpdf": "^1.8.1",
     "zod": "^4.6.7"
