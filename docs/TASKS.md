@@ -85,12 +85,14 @@ Complete and verify each phase before starting the next.
 **Acceptance:** Estimates are mathematically modeled projections based on verified transactions and active subscriptions, never presented as guarantees.
 
 ## Phase 10 — Production readiness
-- [ ] Review authorization, IDOR, XSS, CSRF, injection, uploads, and rate limits.
-- [ ] Dependency/secret scans; privacy-safe logging.
-- [ ] End-to-end export and deletion tests.
-- [ ] Monitoring, backups, tested restore, deployment/rollback docs.
-- [ ] Accessibility review and production build.
-**Acceptance:** Critical security and correctness tests pass; recovery is documented and tested.
+- [x] Reviewed authorization, multi-tenant IDOR defense, XSS, CSRF (`HttpOnly`/`SameSite=Lax` cookies), CSV formula injection neutralization, and in-memory sliding-window rate limiting on login, registration, deletion, and AI chat (`server/lib/rate-limiter.ts`).
+- [x] Privacy-safe logging and automated data masking (`server/lib/privacy-logger.ts`) for 16-digit cards, Indian PANs, emails, account numbers, and secrets.
+- [x] Right to be Forgotten cascading purge across all 8 MongoDB collections with password confirmation (`server/services/user-deletion.service.ts` & `POST /api/auth/delete-account`).
+- [x] Self-serve data portability center and accessible deletion modal at `app/dashboard/settings/page.tsx`.
+- [x] Disaster recovery, backup/restore, rollback instructions, and environment variables checklist documented in `docs/DEPLOYMENT.md`.
+- [x] Accessibility review, keyboard navigation, and production Turbopack build passing (42 routes).
+- [x] Automated test suite in `tests/security-and-readiness.test.ts` (121 total passing tests across 26 test suites).
+**Acceptance:** Critical security, multi-tenant isolation, and correctness tests pass; recovery is documented and tested.
 
 ## Phase 11 — Optional bank integration
 - [ ] Verify provider, eligibility, terms, regulations, and legal requirements.

@@ -2,8 +2,29 @@ import { NextResponse } from "next/server";
 import { getCollection, ensureDatabaseIndexes } from "@/server/db/mongodb";
 import { RegisterInputSchema, UserDocument } from "@/server/models/user";
 import { hashPassword, createSessionToken, setSessionCookie } from "@/server/lib/auth";
+import { rateLimiter, getClientIp } from "@/server/lib/rate-limiter";
 
 export async function POST(request: Request) {
+  const ip = getClientIp(request);
+  const rateLimit = rateLimiter.check(`register_${ip}`, 5, 60 * 1000); // 5 registrations per minute per IP
+
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      {
+        error: {
+          code: "TOO_MANY_REQUESTS",
+          message: "Too many registration attempts. Please wait a minute before trying again.",
+        },
+      },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(Math.ceil(rateLimit.resetMs / 1000)),
+        },
+      }
+    );
+  }
+
   try {
     const body = await request.json();
     const validated = RegisterInputSchema.safeParse(body);

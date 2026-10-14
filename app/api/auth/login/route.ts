@@ -2,8 +2,29 @@ import { NextResponse } from "next/server";
 import { getCollection } from "@/server/db/mongodb";
 import { LoginInputSchema, UserDocument } from "@/server/models/user";
 import { verifyPassword, createSessionToken, setSessionCookie } from "@/server/lib/auth";
+import { rateLimiter, getClientIp } from "@/server/lib/rate-limiter";
 
 export async function POST(request: Request) {
+  const ip = getClientIp(request);
+  const rateLimit = rateLimiter.check(`login_${ip}`, 10, 60 * 1000); // 10 attempts per minute
+
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      {
+        error: {
+          code: "TOO_MANY_REQUESTS",
+          message: "Too many login attempts. Please wait a minute before trying again.",
+        },
+      },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(Math.ceil(rateLimit.resetMs / 1000)),
+        },
+      }
+    );
+  }
+
   try {
     const body = await request.json();
     const validated = LoginInputSchema.safeParse(body);
@@ -56,6 +77,7 @@ export async function POST(request: Request) {
       displayName: user.displayName,
     });
     await setSessionCookie(token);
+    rateLimiter.reset(`login_${ip}`);
 
     return NextResponse.json({
       data: {

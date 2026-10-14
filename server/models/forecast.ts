@@ -58,3 +58,4 @@ export const ForecastQuerySchema = z.object({
 });
 
 export type ForecastQueryInput = z.infer<typeof ForecastQuerySchema>;
+

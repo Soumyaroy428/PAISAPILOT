@@ -26,6 +26,7 @@ import {
   Tag,
   Target,
   Bell,
+  Settings,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -208,6 +209,11 @@ export default function DashboardPage() {
               <Download className="mr-1.5 h-3.5 w-3.5" /> Export
             </Button>
           </a>
+          <Link href="/dashboard/settings">
+            <Button variant="outline" size="sm" className="font-semibold text-xs border-border text-foreground hover:bg-muted shadow-2xs">
+              <Settings className="mr-1.5 h-3.5 w-3.5" /> Settings
+            </Button>
+          </Link>
           <Button
             variant="outline"
             size="sm"

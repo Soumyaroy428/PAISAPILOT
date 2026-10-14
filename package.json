@@ -12,7 +12,7 @@
     "build": "next build",
     "start": "next start",
     "type-check": "tsc --noEmit",
-    "test": "tsx --test tests/money-and-models.test.ts tests/statement-parser.test.ts tests/analytics.test.ts tests/categorization.test.ts tests/assistant.test.ts tests/budgets-and-recurring.test.ts tests/forecasting.test.ts"
+    "test": "tsx --test tests/money-and-models.test.ts tests/statement-parser.test.ts tests/analytics.test.ts tests/categorization.test.ts tests/assistant.test.ts tests/budgets-and-recurring.test.ts tests/forecasting.test.ts tests/security-and-readiness.test.ts"
   },
   "repository": {
     "type": "git",

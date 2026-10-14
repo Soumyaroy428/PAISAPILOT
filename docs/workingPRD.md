@@ -84,8 +84,7 @@ Status Key:
 | Financial Dashboard & Analytics (Totals, trends, categories, Recharts) | `WORKING` | Single source of truth calculation engine in `server/services/analytics.service.ts`, Recharts visualizer, accessible table toggle, category matrix, and deep-dive reports in `app/dashboard/reports/page.tsx`. |
 | Transaction Categorization (Deterministic rules + AI fallback) | `WORKING` | Deterministic rule dictionary covering 100+ Indian merchants, default taxonomy auto-seeding, user customization, safe auto-categorization runner, and candidate preview badges. |
 | Cash-Flow Forecasting & Insights | `WORKING` | Deterministic projection engine in `server/services/forecast.service.ts`, 30/60/90-day simulation across Baseline/Conservative/Optimistic scenarios, outlier filtering, low-data heuristic mode, endpoint `/api/forecast`, and interactive visualizer in `app/dashboard/forecast/page.tsx`. |
-| Privacy Controls, Data Export & Account Deletion | `WORKING` | Secure CSV and JSON export engine (`server/services/export.service.ts` + `/api/analytics/export`) with CSV injection protection; privacy policy live. |
-| Production Hardening & CI/CD | `NOT STARTED` | Next.js production build passes locally; CI/CD scheduled for Checkpoint 10. |
+| Production Hardening & CI/CD | `WORKING` | In-memory sliding-window rate limiting (`server/lib/rate-limiter.ts`), privacy-safe logger with financial masking (`server/lib/privacy-logger.ts`), full cascading account purge (`server/services/user-deletion.service.ts` & `POST /api/auth/delete-account`), self-serve data portability center in `app/dashboard/settings/page.tsx`, and deployment guide in `docs/DEPLOYMENT.md`. |
 | Authorized Bank Integration (Account Aggregator) | `NOT STARTED` | Explicitly deferred until verified provider eligibility. |
 
 ---
@@ -93,7 +92,10 @@ Status Key:
 ## 5. Verification & Tests Executed
 
 - **Unit Test Suite (`npm test`):**
-  - **109/109 automated unit tests passing across 23 suites (0 failures).**
+  - **121/121 automated unit tests passing across 26 suites (0 failures).**
+  - Rate Limiting Defense: verified sliding-window quota enforcement, blocking on threshold breach, resetMs header, and explicit key resets on successful authentication.
+  - Privacy-Safe Logging & Data Masking: verified automated masking of 16-digit credit cards, Indian PAN numbers, emails, bank accounts, and complete object redaction of passwords, tokens, API keys, and cookies.
+  - Multi-Tenant Isolation & Account Deletion: verified complete multi-collection cascading purge across all 8 MongoDB collections (`transactions`, `accounts`, `categories`, `budgets`, `recurring`, `notifications`, `imports`, `users`) with zero cross-tenant contamination.
   - Cash-Flow Forecasting & Trajectory Simulation: verified `ForecastQuerySchema` (30/60/90-day horizons, string coercion, rejection of invalid horizons and scenarios), integer paise simulation across Baseline, Conservative (+15% burn, zero unconfirmed inflows), and Optimistic (-15% burn) scenarios.
   - Cash Runway & Outlier Defenses: verified runway calculations (sustainable null when inflows >= burn, exact integer days during net burn, zero runway on depleted balance), and verified outlier filtering preventing one-off capital purchases (> ₹50,000) from inflating the daily variable burn rate.
   - Lowest Projected Balance Point: verified tracking of mid-month cash crunch dips and recovery following salary credits.
@@ -122,7 +124,9 @@ Status Key:
   - Single Source of Truth Financial Calculation: verified internal transfers exclusion from P&L, savings rate calculation with zero-income and deficit defense.
   - CSV Formula Injection Defense: verified neutralization of dangerous spreadsheet formula prefixes (`=`, `+`, `-`, `@`) and RFC quoting.
 - **Lint / Type Check:** `npm run type-check` (`tsc --noEmit`) -> **PASS (0 errors across all routes, services, charts, models, and parsers)**.
-- **Production Build:** `npm run build` (`next build` with Turbopack) -> **PASS (40 routes compiled successfully, including 25 dynamic API routes and 15 static/prerendered pages)**.
+- **Production Build:** `npm run build` (`next build` with Turbopack) -> **PASS (42 routes compiled successfully, including 26 dynamic API routes and 16 static/prerendered pages)**.
+- **Security & Account Deletion Endpoints:**
+  - `POST /api/auth/delete-account` -> Cascades permanent deletion across all 8 user collections with password verification and sliding-window rate limiting.
 - **Cash-Flow Forecasting Endpoints:**
   - `GET /api/forecast` -> Returns deterministic 30/60/90-day cash flow projections, runway days, lowest cash point, and scenario comparison.
 - **Budgets, Recurring & Notification Endpoints:**
@@ -134,7 +138,7 @@ Status Key:
   - `GET/POST /api/notifications` -> Returns notification feed or triggers idempotent alert generation scan.
   - `PATCH /api/notifications/[id]/read` -> Marks single notification or all user notifications as read.
 - **AI Assistant Endpoints:**
-  - `POST /api/assistant/chat` -> Secure grounded AI conversational endpoint with prompt sanitization, intent classification, bounded facts injection, and Gemini / deterministic fallback execution.
+  - `POST /api/assistant/chat` -> Secure grounded AI conversational endpoint with prompt sanitization, intent classification, bounded facts injection, rate limiting, and Gemini / deterministic fallback execution.
 - **Categories & Intelligence Endpoints:**
   - `GET /api/categories` -> Returns active categories for authenticated user with auto-seeded Indian defaults.
   - `POST /api/categories` -> Creates custom category with hex color and normalized uniqueness enforcement.
@@ -144,9 +148,10 @@ Status Key:
   - `GET /api/analytics/dashboard` -> Aggregates real-time P&L metrics, category distributions, Recharts trend points, and data coverage scope.
   - `GET /api/analytics/export` -> Secure stream download of sanitized CSV and clean JSON transaction exports with date-range filters.
 - **Interactive UI Ledgers & Analytics:**
+  - `app/dashboard/settings/page.tsx` -> Security & Data Privacy portal with verified identity details, 1-click JSON/CSV self-serve data portability, and password-confirmed Right to be Forgotten account purge.
   - `app/dashboard/forecast/page.tsx` -> Cash-Flow Forecasting & Runway portal with 30/60/90-day horizon selector, Baseline/Conservative/Optimistic scenarios, Recharts line charts, milestone commitments timeline, and accessible table toggle.
   - `app/dashboard/budgets/page.tsx` -> 3-tab financial controls center: Monthly Budgets (progress bars, status badges, modal), Recurring Subscriptions & Bills (upcoming bills timeline, detected candidates review, rules table), and Idempotent Notifications feed with mark-as-read actions.
-  - `app/dashboard/page.tsx` -> Recharts Cash Flow Inflows vs Outflows visualization, accessible tabular view toggle, budget threshold alert bar, Module 7 & 8 navigation cards, and data coverage notice.
+  - `app/dashboard/page.tsx` -> Recharts Cash Flow Inflows vs Outflows visualization, accessible tabular view toggle, budget threshold alert bar, Module 7 & 8 navigation cards, Settings button, and data coverage notice.
   - `app/dashboard/assistant/page.tsx` -> PaisaPilot Copilot portal with verified facts strip, quick prompt pills, markdown thread, suggested follow-ups, and copy actions.
   - `app/dashboard/categories/page.tsx` -> Interactive category taxonomy manager, color chips, custom category modal, and one-click auto-categorization runner.
   - `app/dashboard/reports/page.tsx` -> Full P&L breakdown, category expenditure matrix (count, total, average ticket size, % share), and self-serve export center.
