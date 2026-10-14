@@ -140,7 +140,7 @@ test("AI Assistant - Grounded Deterministic Engine Verification", async (t) => {
       MOCK_CONTEXT
     );
 
-    assert.equal(res.message.includes("Comfortably Affordable"), true);
+    assert.equal(res.message.toLowerCase().includes("comfortably afford"), true);
     assert.equal(res.message.includes("₹1,22,000"), true); // Reserve after purchase
   });
 
@@ -152,8 +152,8 @@ test("AI Assistant - Grounded Deterministic Engine Verification", async (t) => {
       MOCK_CONTEXT
     );
 
-    assert.equal(res.message.includes("Proceed With Caution"), true);
-    assert.equal(res.message.includes("exceed your monthly budget headroom"), true);
+    assert.equal(res.message.toLowerCase().includes("proceed with caution"), true);
+    assert.equal(res.message.toLowerCase().includes("budget headroom"), true);
   });
 
   await t.test("verifies affordability check when purchase exceeds liquid balance", () => {
@@ -164,8 +164,8 @@ test("AI Assistant - Grounded Deterministic Engine Verification", async (t) => {
       MOCK_CONTEXT
     );
 
-    assert.equal(res.message.includes("Not Recommended Right Now"), true);
-    assert.equal(res.message.includes("exceeds your total available liquidity"), true);
+    assert.equal(res.message.toLowerCase().includes("wouldn't recommend"), true);
+    assert.equal(res.message.toLowerCase().includes("available balance"), true);
   });
 
   await t.test("formats system instructions strictly bounding model context", () => {

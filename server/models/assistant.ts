@@ -76,3 +76,4 @@ export interface AssistantResponsePayload {
   suggestedFollowUps: string[];
   engine: "gemini-api" | "grounded-deterministic";
 }
+

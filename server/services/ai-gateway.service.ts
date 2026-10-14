@@ -133,6 +133,24 @@ export function generateGroundedDeterministicResponse(
   const isBudgetExceeded = context.budgetUtilizationPercent > 100;
   const isBudgetWarning = context.budgetUtilizationPercent > 80 && !isBudgetExceeded;
 
+  // Fresh / empty state check
+  if (context.totalTransactionsCount === 0) {
+    const msg = `You're in a clean starting position for ${context.periodLabel}!
+
+Right now, you haven't recorded any income or expenses yet, so your entire monthly budget of ${formatPaiseToINR(context.monthlyBudgetPaise)} is completely intact and available. Across your active accounts, your liquid balance is currently ${formatPaiseToINR(context.reconciledBalancePaise)}.
+
+Whenever you're ready, you can add your first transaction or import a bank statement. As soon as you do, I'll automatically break down your spending habits, track your savings rate, and help keep you within your targets.`;
+
+    return {
+      message: msg,
+      suggestedFollowUps: [
+        "How do I import a bank statement?",
+        "Can I afford a ₹5,000 purchase right now?",
+        "What is my monthly budget?",
+      ],
+    };
+  }
+
   if (intent === "affordability_query") {
     const targetAmountPaise = extractRupeeAmountFromPrompt(prompt);
 
@@ -141,26 +159,15 @@ export function generateGroundedDeterministicResponse(
       const remainingAfterPurchase = context.reconciledBalancePaise - targetAmountPaise;
       const budgetHeadroomAfter = context.budgetRemainingPaise - targetAmountPaise;
 
-      let verdict = "";
+      let msg = "";
       if (targetAmountPaise > context.reconciledBalancePaise) {
-        verdict = `❌ **Not Recommended Right Now**: This purchase (${formattedTarget}) exceeds your total available liquidity of ${formatPaiseToINR(context.reconciledBalancePaise)}. Attempting this would result in an immediate cash deficit.`;
+        msg = `I wouldn't recommend making this purchase right now. Spending ${formattedTarget} exceeds your entire available balance of ${formatPaiseToINR(context.reconciledBalancePaise)}, which would put you in a negative cash deficit. It's safer to build up a small cash reserve first before taking on this expense.`;
       } else if (budgetHeadroomAfter < 0) {
-        verdict = `⚠️ **Proceed With Caution**: You have sufficient liquidity (${formatPaiseToINR(context.reconciledBalancePaise)}), but this purchase (${formattedTarget}) will exceed your monthly budget headroom of ${formatPaiseToINR(context.budgetRemainingPaise)} by ${formatPaiseToINR(Math.abs(budgetHeadroomAfter))}.`;
+        const overBudget = formatPaiseToINR(Math.abs(budgetHeadroomAfter));
+        msg = `You have enough cash in your accounts (${formatPaiseToINR(context.reconciledBalancePaise)}) to pay for ${formattedTarget}, but proceed with caution: this purchase would exceed your remaining monthly budget headroom of ${formatPaiseToINR(context.budgetRemainingPaise)} by ${overBudget}. If it isn't urgent, you might want to wait until next month or trim down other expenses to stay on track.`;
       } else {
-        verdict = `✅ **Comfortably Affordable**: You have sufficient liquidity (${formatPaiseToINR(context.reconciledBalancePaise)}) and sufficient remaining budget headroom (${formatPaiseToINR(context.budgetRemainingPaise)}). After this purchase, you will retain **${formatPaiseToINR(remainingAfterPurchase)}** in cash reserves.`;
+        msg = `Good news — you can comfortably afford this! Spending ${formattedTarget} fits easily within your available cash of ${formatPaiseToINR(context.reconciledBalancePaise)} and leaves you with ${formatPaiseToINR(budgetHeadroomAfter)} remaining in your monthly budget. You'll still have a healthy ${formatPaiseToINR(remainingAfterPurchase)} in your accounts after the purchase.`;
       }
-
-      const msg = `### Affordability Assessment for ${formattedTarget}
-
-${verdict}
-
-**Financial Position Check:**
-- **Current Liquid Balance:** ${formatPaiseToINR(context.reconciledBalancePaise)}
-- **Monthly Budget Headroom Remaining:** ${formatPaiseToINR(context.budgetRemainingPaise)}
-- **Period Net Cash Flow:** ${formatPaiseToINR(context.netCashflowPaise)}
-- **Estimated Reserve After Purchase:** ${formatPaiseToINR(Math.max(0, remainingAfterPurchase))}
-
-*Tip: Consider spacing large non-essential purchases if you anticipate upcoming recurring bill commitments or tax payments.*`;
 
       return {
         message: msg,
@@ -174,33 +181,34 @@ ${verdict}
   }
 
   if (intent === "spending_breakdown") {
-    const catList =
-      context.topCategories.length > 0
-        ? context.topCategories
-            .map(
-              (c, i) =>
-                `${i + 1}. **${c.name}**: ${formatPaiseToINR(c.amountPaise)} (${c.percent.toFixed(1)}% of total outflows)`
-            )
-            .join("\n")
-        : "No categorized expenses recorded in this period yet.";
+    if (context.topCategories.length === 0) {
+      return {
+        message: `You don't have any categorized expenses recorded for ${context.periodLabel} yet. As soon as you add or import your expenses, I'll show you exactly how much you're spending across food, rent, shopping, and bills.`,
+        suggestedFollowUps: [
+          "How do I add a new category?",
+          "Show my financial summary",
+          "Can I afford a ₹10,000 purchase?",
+        ],
+      };
+    }
 
-    const msg = `### Spending Breakdown (${context.periodLabel})
+    const topList = context.topCategories
+      .map(
+        (c) =>
+          `• ${c.name}: ${formatPaiseToINR(c.amountPaise)} (${c.percent.toFixed(1)}% of spending)`
+      )
+      .join("\n");
 
-Here is how your outflows are distributed across verified categories:
+    const msg = `Here is where your money has gone during ${context.periodLabel}. You've spent a total of ${formatPaiseToINR(context.totalExpensePaise)} across ${context.totalTransactionsCount} transactions:
 
-${catList}
+${topList}
 
-**Summary Statistics:**
-- **Total Period Outflows:** ${formatPaiseToINR(context.totalExpensePaise)}
-- **Transactions Recorded:** ${context.totalTransactionsCount}
-- **Data Coverage:** ${context.dataCoverage}
-
-*Note: Internal inter-account transfers are strictly excluded from outflows to prevent double counting.*`;
+Your highest expense is ${context.topCategories[0].name}, making up ${context.topCategories[0].percent.toFixed(1)}% of everything you spent this period.`;
 
     return {
       message: msg,
       suggestedFollowUps: [
-        "How can I cut down on my top spending category?",
+        `How can I cut down on ${context.topCategories[0].name}?`,
         "Can I afford a ₹10,000 purchase this month?",
         "What is my current savings rate?",
       ],
@@ -209,21 +217,18 @@ ${catList}
 
   if (intent === "savings_optimization") {
     const topBurn = context.topCategories[0];
-    const topBurnText = topBurn
-      ? `Your largest outflow is **${topBurn.name}** at ${formatPaiseToINR(topBurn.amountPaise)} (${topBurn.percent.toFixed(1)}% of expenses). Reducing this by 10% would save an extra **${formatPaiseToINR(Math.round(topBurn.amountPaise * 0.1))}** per period.`
-      : "Start by tracking your daily expenses to establish an accurate spending baseline.";
+    const topBurnAdvice = topBurn
+      ? `Your biggest outflow right now is ${topBurn.name} at ${formatPaiseToINR(topBurn.amountPaise)}. Trimming just 10% from this category would give you an extra ${formatPaiseToINR(Math.round(topBurn.amountPaise * 0.1))} in savings every month.`
+      : "Try logging a few days of daily expenses to give us a clear baseline of your spending.";
 
-    const msg = `### Savings & Cash Flow Optimization
+    const msg = `Here is how your savings look for ${context.periodLabel}:
 
-**Current Performance:**
-- **Savings Rate:** **${context.savingsRatePercent.toFixed(1)}%** (Target: 20-30% for sustainable wealth building)
-- **Net Inflow vs Outflow:** ${formatPaiseToINR(context.netCashflowPaise)}
-- **Budget Utilization:** ${context.budgetUtilizationPercent.toFixed(1)}% (${isBudgetExceeded ? "⚠️ Over budget" : isBudgetWarning ? "⚡ Approaching limit" : "✅ On track"})
+Your current savings rate is ${context.savingsRatePercent.toFixed(1)}% with a net cash flow of ${formatPaiseToINR(context.netCashflowPaise)}. ${isBudgetExceeded ? "You are currently running over your monthly budget limit." : isBudgetWarning ? "You are getting close to your monthly spending limit." : "You are staying comfortably within your budget."}
 
-**Actionable Insights:**
-1. **Target the Largest Burn:** ${topBurnText}
-2. **Review Recurring Subscriptions:** Audit digital subscriptions, OTT, and utility recharges.
-3. **Emergency Fund Buffer:** Strive to maintain at least 3-6 months of essential living expenses (${formatPaiseToINR(context.totalExpensePaise * 3)}) in liquid accounts or high-yield savings.`;
+Here are three simple ways you can boost your savings:
+1. Target your biggest spend: ${topBurnAdvice}
+2. Review recurring subscriptions: Check for any streaming services, gym memberships, or app subscriptions you haven't used recently.
+3. Build your emergency safety net: Try to keep at least 3 months of basic living expenses (${formatPaiseToINR(context.totalExpensePaise * 3)}) tucked away in liquid savings for peace of mind.`;
 
     return {
       message: msg,
@@ -235,27 +240,21 @@ ${catList}
     };
   }
 
-  // Default Financial Summary
-  const statusBadge = isBudgetExceeded
-    ? "⚠️ **Budget Exceeded**"
-    : isBudgetWarning
-    ? "⚡ **Approaching Budget Limit**"
-    : "✅ **Healthy & Within Limits**";
+  // Default Financial Summary in human conversational sentences
+  let budgetSentence = "";
+  if (isBudgetExceeded) {
+    budgetSentence = `You've spent ${formatPaiseToINR(context.totalExpensePaise)} so far, which is higher than your ${formatPaiseToINR(context.monthlyBudgetPaise)} monthly budget.`;
+  } else if (isBudgetWarning) {
+    budgetSentence = `You've utilized ${context.budgetUtilizationPercent.toFixed(1)}% of your monthly budget, with ${formatPaiseToINR(context.budgetRemainingPaise)} left to spend safely.`;
+  } else {
+    budgetSentence = `You're comfortably within budget, having used only ${context.budgetUtilizationPercent.toFixed(1)}% of your ${formatPaiseToINR(context.monthlyBudgetPaise)} limit. You still have ${formatPaiseToINR(context.budgetRemainingPaise)} in spending headroom.`;
+  }
 
-  const msg = `### Financial Snapshot (${context.periodLabel})
+  const msg = `Here is a clear snapshot of your finances for ${context.periodLabel}:
 
-${statusBadge}
+${budgetSentence}
 
-**Key Metrics (Integer Paise Precision):**
-- **Total Inflows (Income):** ${formatPaiseToINR(context.totalIncomePaise)}
-- **Total Outflows (Expenses):** ${formatPaiseToINR(context.totalExpensePaise)}
-- **Net Cash Flow:** ${formatPaiseToINR(context.netCashflowPaise)}
-- **Reconciled Liquidity (All Accounts):** ${formatPaiseToINR(context.reconciledBalancePaise)}
-- **Monthly Budget Headroom:** ${formatPaiseToINR(context.budgetRemainingPaise)} remaining of ${formatPaiseToINR(context.monthlyBudgetPaise)} (${context.budgetUtilizationPercent.toFixed(1)}% utilized)
-- **Savings Rate:** **${context.savingsRatePercent.toFixed(1)}%**
-
-**Data Scope:**
-*${context.dataCoverage}. All inter-account transfers are strictly excluded from P&L calculations.*`;
+In total, you've brought in ${formatPaiseToINR(context.totalIncomePaise)} in income and spent ${formatPaiseToINR(context.totalExpensePaise)}, leaving you with a net cash flow of ${formatPaiseToINR(context.netCashflowPaise)} and a healthy savings rate of ${context.savingsRatePercent.toFixed(1)}%. Across all your payment accounts, your current liquid balance stands at ${formatPaiseToINR(context.reconciledBalancePaise)}.`;
 
   return {
     message: msg,
