@@ -74,10 +74,15 @@ Complete and verify each phase before starting the next.
 **Acceptance:** No duplicate alerts; calculations match documented rules.
 
 ## Phase 9 — Forecasting and insights
-- [ ] Define method and minimum historical data.
-- [ ] Implement deterministic forecasts with assumptions.
-- [ ] Low-data state, uncertainty labels, outlier tests.
-**Acceptance:** Estimates are not presented as guarantees.
+- [x] Defined deterministic method, horizon options (30, 60, 90 days), and minimum historical data thresholds (`server/models/forecast.ts` & `server/services/forecast.service.ts`).
+- [x] Implemented deterministic integer paise forecasts across Baseline, Conservative (+15% burn), and Optimistic (-15% burn) scenarios.
+- [x] Outlier filtering (> ₹50,000 or > 4x median) preventing one-off capital expenses from distorting regular variable burn.
+- [x] Low-data state banner and transparent uncertainty ratings (`high`, `moderate`, `low` preliminary heuristic).
+- [x] API endpoint `GET /api/forecast?horizon=30&scenario=baseline` with input validation (`ForecastQuerySchema`).
+- [x] Interactive UI at `app/dashboard/forecast/page.tsx` with Recharts projection curves, milestone bills timeline, runway metrics, and accessible table toggle.
+- [x] Added Module 8 navigation card in `app/dashboard/page.tsx`.
+- [x] Automated unit test suite: `tests/forecasting.test.ts` (109 total passing tests across 23 suites).
+**Acceptance:** Estimates are mathematically modeled projections based on verified transactions and active subscriptions, never presented as guarantees.
 
 ## Phase 10 — Production readiness
 - [ ] Review authorization, IDOR, XSS, CSRF, injection, uploads, and rate limits.

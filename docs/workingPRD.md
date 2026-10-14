@@ -83,8 +83,7 @@ Status Key:
 | Statement Import Pipeline (CSV / SBI PDF, parsing, preview, commit) | `WORKING` | In-memory private parser, `server/lib/parsers/csv.parser.ts`, `server/lib/parsers/sbi-pdf.parser.ts`, duplicate fingerprinting, candidate staging, preview table UI in `app/dashboard/import/page.tsx`, and idempotent commit. |
 | Financial Dashboard & Analytics (Totals, trends, categories, Recharts) | `WORKING` | Single source of truth calculation engine in `server/services/analytics.service.ts`, Recharts visualizer, accessible table toggle, category matrix, and deep-dive reports in `app/dashboard/reports/page.tsx`. |
 | Transaction Categorization (Deterministic rules + AI fallback) | `WORKING` | Deterministic rule dictionary covering 100+ Indian merchants, default taxonomy auto-seeding, user customization, safe auto-categorization runner, and candidate preview badges. |
-| Budgets, Recurring Payments & Notifications | `WORKING` | Document models, indexes, budget progress calculator with status progression, recurring candidate auto-detection, period-fingerprinted idempotent notifications, and 3-tab portal in `app/dashboard/budgets/page.tsx`. |
-| Cash-Flow Forecasting & Insights | `NOT STARTED` | Scheduled for Checkpoint 9. |
+| Cash-Flow Forecasting & Insights | `WORKING` | Deterministic projection engine in `server/services/forecast.service.ts`, 30/60/90-day simulation across Baseline/Conservative/Optimistic scenarios, outlier filtering, low-data heuristic mode, endpoint `/api/forecast`, and interactive visualizer in `app/dashboard/forecast/page.tsx`. |
 | Privacy Controls, Data Export & Account Deletion | `WORKING` | Secure CSV and JSON export engine (`server/services/export.service.ts` + `/api/analytics/export`) with CSV injection protection; privacy policy live. |
 | Production Hardening & CI/CD | `NOT STARTED` | Next.js production build passes locally; CI/CD scheduled for Checkpoint 10. |
 | Authorized Bank Integration (Account Aggregator) | `NOT STARTED` | Explicitly deferred until verified provider eligibility. |
@@ -94,7 +93,10 @@ Status Key:
 ## 5. Verification & Tests Executed
 
 - **Unit Test Suite (`npm test`):**
-  - **96/96 automated unit tests passing across 20 suites (0 failures).**
+  - **109/109 automated unit tests passing across 23 suites (0 failures).**
+  - Cash-Flow Forecasting & Trajectory Simulation: verified `ForecastQuerySchema` (30/60/90-day horizons, string coercion, rejection of invalid horizons and scenarios), integer paise simulation across Baseline, Conservative (+15% burn, zero unconfirmed inflows), and Optimistic (-15% burn) scenarios.
+  - Cash Runway & Outlier Defenses: verified runway calculations (sustainable null when inflows >= burn, exact integer days during net burn, zero runway on depleted balance), and verified outlier filtering preventing one-off capital purchases (> ₹50,000) from inflating the daily variable burn rate.
+  - Lowest Projected Balance Point: verified tracking of mid-month cash crunch dips and recovery following salary credits.
   - Budget Validation & Progress Logic: verified `CreateBudgetSchema` (positive INR amount, default 85% threshold, 50-100% threshold boundaries), `UpdateBudgetSchema` partial updates, and integer paise utilization with status transitions (`normal`, `warning` at 85%, `exceeded` >100% with clamped 0 remaining).
   - Recurring Payments & Subscriptions: verified `CreateRecurringSchema` (frequencies: monthly, quarterly, yearly, weekly; ISO YYYY-MM-DD date validation), status transitions (`candidate`, `active`, `paused`, `dismissed`), and next expected due date projection into the future.
   - Recurring Merchant Detection Heuristics: verified identification of common Indian subscriptions (Netflix, Spotify, Bescom, Zerodha SIP, Rent).
@@ -120,7 +122,9 @@ Status Key:
   - Single Source of Truth Financial Calculation: verified internal transfers exclusion from P&L, savings rate calculation with zero-income and deficit defense.
   - CSV Formula Injection Defense: verified neutralization of dangerous spreadsheet formula prefixes (`=`, `+`, `-`, `@`) and RFC quoting.
 - **Lint / Type Check:** `npm run type-check` (`tsc --noEmit`) -> **PASS (0 errors across all routes, services, charts, models, and parsers)**.
-- **Production Build:** `npm run build` (`next build` with Turbopack) -> **PASS (38 routes compiled successfully, including 24 dynamic API routes and 14 static/prerendered pages)**.
+- **Production Build:** `npm run build` (`next build` with Turbopack) -> **PASS (40 routes compiled successfully, including 25 dynamic API routes and 15 static/prerendered pages)**.
+- **Cash-Flow Forecasting Endpoints:**
+  - `GET /api/forecast` -> Returns deterministic 30/60/90-day cash flow projections, runway days, lowest cash point, and scenario comparison.
 - **Budgets, Recurring & Notification Endpoints:**
   - `GET/POST /api/budgets` -> Aggregates active budgets with real-time monthly spending progress or creates custom category budget.
   - `PATCH/DELETE /api/budgets/[id]` -> Partial updates and safe soft-delete archiving of budgets.
@@ -140,8 +144,9 @@ Status Key:
   - `GET /api/analytics/dashboard` -> Aggregates real-time P&L metrics, category distributions, Recharts trend points, and data coverage scope.
   - `GET /api/analytics/export` -> Secure stream download of sanitized CSV and clean JSON transaction exports with date-range filters.
 - **Interactive UI Ledgers & Analytics:**
+  - `app/dashboard/forecast/page.tsx` -> Cash-Flow Forecasting & Runway portal with 30/60/90-day horizon selector, Baseline/Conservative/Optimistic scenarios, Recharts line charts, milestone commitments timeline, and accessible table toggle.
   - `app/dashboard/budgets/page.tsx` -> 3-tab financial controls center: Monthly Budgets (progress bars, status badges, modal), Recurring Subscriptions & Bills (upcoming bills timeline, detected candidates review, rules table), and Idempotent Notifications feed with mark-as-read actions.
-  - `app/dashboard/page.tsx` -> Recharts Cash Flow Inflows vs Outflows visualization, accessible tabular view toggle, budget threshold alert bar, Module 7 navigation card, and data coverage notice.
+  - `app/dashboard/page.tsx` -> Recharts Cash Flow Inflows vs Outflows visualization, accessible tabular view toggle, budget threshold alert bar, Module 7 & 8 navigation cards, and data coverage notice.
   - `app/dashboard/assistant/page.tsx` -> PaisaPilot Copilot portal with verified facts strip, quick prompt pills, markdown thread, suggested follow-ups, and copy actions.
   - `app/dashboard/categories/page.tsx` -> Interactive category taxonomy manager, color chips, custom category modal, and one-click auto-categorization runner.
   - `app/dashboard/reports/page.tsx` -> Full P&L breakdown, category expenditure matrix (count, total, average ticket size, % share), and self-serve export center.

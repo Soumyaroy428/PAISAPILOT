@@ -193,6 +193,11 @@ export default function DashboardPage() {
               <Target className="mr-1.5 h-3.5 w-3.5 text-rose-500" /> Budgets &amp; Bills
             </Button>
           </Link>
+          <Link href="/dashboard/forecast">
+            <Button size="sm" variant="outline" className="font-semibold text-xs border-border text-foreground hover:bg-muted shadow-2xs">
+              <TrendingUp className="mr-1.5 h-3.5 w-3.5 text-teal-500" /> Forecast
+            </Button>
+          </Link>
           <Link href="/dashboard/transactions">
             <Button size="sm" className="font-semibold shadow-sm text-xs">
               <PlusCircle className="mr-1.5 h-3.5 w-3.5" /> Add Txn
@@ -624,6 +629,24 @@ export default function DashboardPage() {
               <p>Affordability check, savings insights, and grounded financial intelligence.</p>
               <Link href="/dashboard/assistant" className="inline-block text-primary font-semibold hover:underline">
                 Ask Copilot &rarr;
+              </Link>
+            </CardContent>
+          </Card>
+
+          {/* Module 8: Cash-Flow Forecast & Runway */}
+          <Card className="border-border hover:border-foreground/30 transition-all shadow-sm">
+            <CardHeader className="pb-2">
+              <div className="flex items-center space-x-2">
+                <div className="p-2 rounded-lg bg-teal-500/10 text-teal-600 dark:text-teal-400">
+                  <TrendingUp className="h-4 w-4" />
+                </div>
+                <CardTitle className="text-sm font-semibold">Cash-Flow Forecast</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-2 text-xs text-muted-foreground">
+              <p>30/60/90-day trajectory modeling, runway estimates, and scenario testing.</p>
+              <Link href="/dashboard/forecast" className="inline-block text-primary font-semibold hover:underline">
+                View Forecast &rarr;
               </Link>
             </CardContent>
           </Card>

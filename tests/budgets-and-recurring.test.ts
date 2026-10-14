@@ -268,3 +268,4 @@ test("Idempotent Notification Fingerprinting", async (t) => {
     assert.equal(fp1, "recurring_user_12345_rec_67890_2026-10-25");
   });
 });
+

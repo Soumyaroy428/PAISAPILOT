@@ -21,3 +21,4 @@ export interface NotificationDocument extends Document {
   fingerprint: string; // Guaranteed uniqueness per period to prevent duplicate alert spam
   createdAt: Date;
 }
+

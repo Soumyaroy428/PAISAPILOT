@@ -153,3 +153,4 @@ export async function markAllNotificationsRead(userId: string): Promise<boolean>
 
   return res.modifiedCount > 0;
 }
+
