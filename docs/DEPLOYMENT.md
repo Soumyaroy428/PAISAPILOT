@@ -116,3 +116,4 @@ If you ever decide to introduce a persistent 24/7 background worker (e.g. an alw
 1. **Never deploy without user approval** (as per project mandate).
 2. Create a background worker service in Render connecting to the same `MONGODB_URI`.
 3. Set the Start Command to `npm run worker` (if configured in future phases).
+

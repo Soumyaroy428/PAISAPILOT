@@ -31,6 +31,7 @@ const MONTH_MAP: Record<string, string> = {
   jul: "07",
   aug: "08",
   sep: "09",
+  sept: "09",
   oct: "10",
   nov: "11",
   dec: "12",
@@ -67,12 +68,24 @@ export function normalizeBankDate(raw: string): string | null {
   }
 
   // 4. DD-Mon-YYYY or DD Mon YYYY (e.g. 14-Oct-2026, 14 Oct 2026)
-  const monMatch = clean.match(/^(\d{1,2})[-/\s]([A-Za-z]{3})[-/\s](\d{4})$/);
+  const monMatch = clean.match(/^(\d{1,2})[-/\s]([A-Za-z]{3,4})[-/\s](\d{4})$/);
   if (monMatch) {
     const day = monMatch[1].padStart(2, "0");
     const monStr = monMatch[2].toLowerCase();
-    const month = MONTH_MAP[monStr];
+    const month = MONTH_MAP[monStr] || MONTH_MAP[monStr.slice(0, 3)];
     const year = monMatch[3];
+    if (month) {
+      return `${year}-${month}-${day}`;
+    }
+  }
+
+  // 5. Mon DD, YYYY or Month DD, YYYY (e.g. Oct 11, 2026, Sept 30, 2026)
+  const monDayYearMatch = clean.match(/^([A-Za-z]{3,9})\s+(\d{1,2}),?\s+(\d{4})$/);
+  if (monDayYearMatch) {
+    const monStr = monDayYearMatch[1].toLowerCase();
+    const day = monDayYearMatch[2].padStart(2, "0");
+    const year = monDayYearMatch[3];
+    const month = MONTH_MAP[monStr] || MONTH_MAP[monStr.slice(0, 3)];
     if (month) {
       return `${year}-${month}-${day}`;
     }

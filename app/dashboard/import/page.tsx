@@ -253,7 +253,7 @@ export default function StatementImportPage() {
                       }`}
                     >
                       <FileText className="h-4 w-4" />
-                      <span>SBI e-Statement (PDF)</span>
+                      <span>PDF Statement (PhonePe / SBI)</span>
                     </button>
                   </div>
                 </div>
@@ -286,7 +286,7 @@ export default function StatementImportPage() {
                       {file ? file.name : "Drag and drop your file here, or browse"}
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {sourceType === "csv" ? "Supports .csv files up to 5 MB" : "Supports official SBI e-Statement .pdf up to 5 MB"}
+                      {sourceType === "csv" ? "Supports .csv files up to 5 MB" : "Supports official PhonePe & SBI e-Statement .pdf up to 5 MB"}
                     </p>
                     <input
                       type="file"
