@@ -56,12 +56,22 @@ export async function getDatabase(): Promise<Db> {
   return client.db("paisapilot");
 }
 
+type CollectionProvider = (collectionName: string) => any;
+let mockCollectionProvider: CollectionProvider | null = null;
+
+export function setMockCollectionProvider(provider: CollectionProvider | null): void {
+  mockCollectionProvider = provider;
+}
+
 /**
  * Returns a typed collection from the database.
  */
 export async function getCollection<T extends Document = any>(
   collectionName: string
 ): Promise<Collection<T>> {
+  if (mockCollectionProvider) {
+    return mockCollectionProvider(collectionName) as Collection<T>;
+  }
   const db = await getDatabase();
   return db.collection<T>(collectionName);
 }

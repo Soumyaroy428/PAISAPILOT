@@ -17,6 +17,8 @@ import {
   Loader2,
   AlertTriangle,
   CheckCircle2,
+  Building2,
+  ChevronRight,
 } from "lucide-react";
 import { Button } from "@/client/components/ui/Button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/client/components/ui/Card";
@@ -190,6 +192,40 @@ export default function SettingsPage() {
                 <FileCode className="mr-1.5 h-3.5 w-3.5 text-sky-500" /> Download Full JSON Archive
               </Button>
             </a>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Bank Connections & Automatic Synchronization (Account Aggregator) */}
+      <Card className="border-border shadow-sm">
+        <CardHeader className="pb-3">
+          <div className="flex items-center space-x-2">
+            <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+              <Building2 className="h-4 w-4" />
+            </div>
+            <div>
+              <CardTitle className="text-sm font-semibold">Bank Connections &amp; Auto-Sync</CardTitle>
+              <CardDescription className="text-xs">
+                Manage read-only Account Aggregator connections or view consent status
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3 text-xs pt-1">
+          <p className="text-muted-foreground leading-relaxed">
+            Link authorized bank accounts using the RBI-regulated Account Aggregator framework. Zero bank passwords or credentials are ever requested or stored.
+          </p>
+
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+            <Link href="/dashboard/settings/bank-connections">
+              <Button size="sm" variant="outline" className="font-semibold text-xs border-border">
+                <Building2 className="mr-1.5 h-3.5 w-3.5 text-indigo-500" /> Manage Bank Connections
+                <ChevronRight className="ml-1 h-3.5 w-3.5 text-muted-foreground" />
+              </Button>
+            </Link>
+            <Badge variant="outline" className="text-[10px] bg-amber-500/10 text-amber-600 border-amber-500/30">
+              Discovery Gate: FIU Onboarding
+            </Badge>
           </div>
         </CardContent>
       </Card>

@@ -85,17 +85,25 @@ Status Key:
 | Transaction Categorization (Deterministic rules + AI fallback) | `WORKING` | Deterministic rule dictionary covering 100+ Indian merchants, default taxonomy auto-seeding, user customization, safe auto-categorization runner, and candidate preview badges. |
 | Cash-Flow Forecasting & Insights | `WORKING` | Deterministic projection engine in `server/services/forecast.service.ts`, 30/60/90-day simulation across Baseline/Conservative/Optimistic scenarios, outlier filtering, low-data heuristic mode, endpoint `/api/forecast`, and interactive visualizer in `app/dashboard/forecast/page.tsx`. |
 | Production Hardening & CI/CD | `WORKING` | In-memory sliding-window rate limiting (`server/lib/rate-limiter.ts`), privacy-safe logger with financial masking (`server/lib/privacy-logger.ts`), full cascading account purge (`server/services/user-deletion.service.ts` & `POST /api/auth/delete-account`), self-serve data portability center in `app/dashboard/settings/page.tsx`, and deployment guide in `docs/DEPLOYMENT.md`. |
-| Authorized Bank Integration (Account Aggregator) | `NOT STARTED` | Explicitly deferred until verified provider eligibility. |
+| Authorized Bank Integration (Account Aggregator) | `PARTIALLY COMPLETED — BLOCKED` | Discovery Gate Active: RBI NBFC-AA FIU registration/contract required. Full software architecture, models, adapter, routes, settings UI, and 9/9 checkpoint unit/integration tests verified. Feature flag `FEATURE_BANK_SYNC=false` strictly off by default. Zero credentials stored; zero fake simulations. |
 
 ---
 
 ## 5. Verification & Tests Executed
 
 - **Unit Test Suite (`npm test`):**
-  - **121/121 automated unit tests passing across 26 suites (0 failures).**
+  - **133/133 automated unit tests passing across 28 suites (0 failures).**
+  - Bank Sync Discovery Gate & Safety Adapter: verified strict disabled-by-default behavior (`FEATURE_BANK_SYNC=false`), zero-simulation defense in `DisabledBankSyncAdapter` preventing unverified connections, and regulatory notices citing RBI NBFC-AA Master Directions.
+  - Full Consent Lifecycle Transitions: verified state progression (`pending_consent` -> `active` upon provider verification, `expired` upon past consent expiry, and `revoked` upon user disconnect).
+  - CSRF, State Token Correlation & Replay Protection: verified rejection of forged or expired state tokens and complete prevention of replay attacks.
+  - Multi-Tenant Cross-User Isolation Defense: verified cross-user callback hijacking, unauthorized sync triggers, and unauthorized disconnect attempts are strictly rejected.
+  - Idempotent Transaction Deduplication: verified deduplication based on composite provider transaction reference (`[REF:...]`) scoped to account; verified two legitimate identical ₹50 payments on the same date are both preserved without false collision.
+  - Reversals, Refunds & Provenance: verified reversed or refunded debit expenses convert to incoming credit income with provenance tags (`[STATUS:REFUNDED]`, `[REF:...]`, `[UTR:...]`) and reconcile account balances accurately.
+  - Provider Downtime & Fault Recovery: verified graceful error handling (`lastSyncStatus: 'failed'`, redacted `lastErrorCode: 'SYNC_FETCH_ERROR'`) and recovery to `'success'` on retry.
+  - Zod Boundaries & Redaction: verified validation for FIP IDs, duration (1-365 days), 32-character correlation tokens, and secret redaction.
   - Rate Limiting Defense: verified sliding-window quota enforcement, blocking on threshold breach, resetMs header, and explicit key resets on successful authentication.
   - Privacy-Safe Logging & Data Masking: verified automated masking of 16-digit credit cards, Indian PAN numbers, emails, bank accounts, and complete object redaction of passwords, tokens, API keys, and cookies.
-  - Multi-Tenant Isolation & Account Deletion: verified complete multi-collection cascading purge across all 8 MongoDB collections (`transactions`, `accounts`, `categories`, `budgets`, `recurring`, `notifications`, `imports`, `users`) with zero cross-tenant contamination.
+  - Multi-Tenant Isolation & Account Deletion: verified complete multi-collection cascading purge across all 9 MongoDB collections (`transactions`, `accounts`, `categories`, `budgets`, `recurring`, `notifications`, `imports`, `bank_connections`, `users`) with zero cross-tenant contamination.
   - Cash-Flow Forecasting & Trajectory Simulation: verified `ForecastQuerySchema` (30/60/90-day horizons, string coercion, rejection of invalid horizons and scenarios), integer paise simulation across Baseline, Conservative (+15% burn, zero unconfirmed inflows), and Optimistic (-15% burn) scenarios.
   - Cash Runway & Outlier Defenses: verified runway calculations (sustainable null when inflows >= burn, exact integer days during net burn, zero runway on depleted balance), and verified outlier filtering preventing one-off capital purchases (> ₹50,000) from inflating the daily variable burn rate.
   - Lowest Projected Balance Point: verified tracking of mid-month cash crunch dips and recovery following salary credits.
@@ -124,9 +132,15 @@ Status Key:
   - Single Source of Truth Financial Calculation: verified internal transfers exclusion from P&L, savings rate calculation with zero-income and deficit defense.
   - CSV Formula Injection Defense: verified neutralization of dangerous spreadsheet formula prefixes (`=`, `+`, `-`, `@`) and RFC quoting.
 - **Lint / Type Check:** `npm run type-check` (`tsc --noEmit`) -> **PASS (0 errors across all routes, services, charts, models, and parsers)**.
-- **Production Build:** `npm run build` (`next build` with Turbopack) -> **PASS (42 routes compiled successfully, including 26 dynamic API routes and 16 static/prerendered pages)**.
+- **Production Build:** `npm run build` (`next build` with Turbopack) -> **PASS (48 routes compiled successfully, including 31 dynamic API routes and 17 static/prerendered pages)**.
+- **Bank Synchronization Endpoints:**
+  - `GET /api/bank-sync/status` -> Returns current feature flag status, regulatory notices, and active connection details.
+  - `POST /api/bank-sync/connect` -> Enforces Discovery Gate flag, generates cryptographic correlation token, and initiates consent request.
+  - `GET/POST /api/bank-sync/callback` -> Handles provider redirect callback with CSRF/replay defense and multi-tenant user verification.
+  - `POST /api/bank-sync/sync` -> Executes idempotent transaction sync with composite provider reference deduplication.
+  - `POST /api/bank-sync/disconnect` -> Revokes provider consent and marks connection revoked locally.
 - **Security & Account Deletion Endpoints:**
-  - `POST /api/auth/delete-account` -> Cascades permanent deletion across all 8 user collections with password verification and sliding-window rate limiting.
+  - `POST /api/auth/delete-account` -> Cascades permanent deletion across all 9 user collections with password verification and sliding-window rate limiting.
 - **Cash-Flow Forecasting Endpoints:**
   - `GET /api/forecast` -> Returns deterministic 30/60/90-day cash flow projections, runway days, lowest cash point, and scenario comparison.
 - **Budgets, Recurring & Notification Endpoints:**
@@ -148,7 +162,8 @@ Status Key:
   - `GET /api/analytics/dashboard` -> Aggregates real-time P&L metrics, category distributions, Recharts trend points, and data coverage scope.
   - `GET /api/analytics/export` -> Secure stream download of sanitized CSV and clean JSON transaction exports with date-range filters.
 - **Interactive UI Ledgers & Analytics:**
-  - `app/dashboard/settings/page.tsx` -> Security & Data Privacy portal with verified identity details, 1-click JSON/CSV self-serve data portability, and password-confirmed Right to be Forgotten account purge.
+  - `app/dashboard/settings/bank-connections/page.tsx` -> Dedicated Bank Connections & Auto-Sync portal with Discovery Gate regulatory notice, Account Aggregator consent configuration modal, active connection status card, and zero-credential fallback workflow links (PhonePe/PDF import & manual ledger).
+  - `app/dashboard/settings/page.tsx` -> Security & Data Privacy portal with verified identity details, Bank Connections navigation card, 1-click JSON/CSV self-serve data portability, and password-confirmed Right to be Forgotten account purge.
   - `app/dashboard/forecast/page.tsx` -> Cash-Flow Forecasting & Runway portal with 30/60/90-day horizon selector, Baseline/Conservative/Optimistic scenarios, Recharts line charts, milestone commitments timeline, and accessible table toggle.
   - `app/dashboard/budgets/page.tsx` -> 3-tab financial controls center: Monthly Budgets (progress bars, status badges, modal), Recurring Subscriptions & Bills (upcoming bills timeline, detected candidates review, rules table), and Idempotent Notifications feed with mark-as-read actions.
   - `app/dashboard/page.tsx` -> Recharts Cash Flow Inflows vs Outflows visualization, accessible tabular view toggle, budget threshold alert bar, Module 7 & 8 navigation cards, Settings button, and data coverage notice.

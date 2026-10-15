@@ -21,6 +21,7 @@ export interface AccountDeletionResult {
     recurring: number;
     notifications: number;
     imports: number;
+    bankConnections?: number;
   };
 }
 
@@ -61,6 +62,7 @@ export async function deleteUserAccountPermanently(
     recCol,
     notCol,
     impCol,
+    bankCol,
   ] = await Promise.all([
     getCollection<TransactionDocument>("transactions"),
     getCollection<AccountDocument>("accounts"),
@@ -69,6 +71,7 @@ export async function deleteUserAccountPermanently(
     getCollection<RecurringDocument>("recurring"),
     getCollection<NotificationDocument>("notifications"),
     getCollection<ImportDocument>("imports"),
+    getCollection<any>("bank_connections"),
   ]);
 
   const [
@@ -79,6 +82,7 @@ export async function deleteUserAccountPermanently(
     recRes,
     notRes,
     impRes,
+    bankRes,
   ] = await Promise.all([
     txCol.deleteMany({ userId }),
     accCol.deleteMany({ userId }),
@@ -87,6 +91,7 @@ export async function deleteUserAccountPermanently(
     recCol.deleteMany({ userId }),
     notCol.deleteMany({ userId }),
     impCol.deleteMany({ userId }),
+    bankCol.deleteMany({ userId }),
   ]);
 
   // 3. Delete the user document itself
@@ -98,6 +103,7 @@ export async function deleteUserAccountPermanently(
   safeLogger.info(`Account deleted permanently for user ID: ${userId}`, {
     deletedTransactions: txRes.deletedCount,
     deletedAccounts: accRes.deletedCount,
+    deletedBankConnections: bankRes.deletedCount,
   });
 
   return {
@@ -110,6 +116,7 @@ export async function deleteUserAccountPermanently(
       recurring: recRes.deletedCount,
       notifications: notRes.deletedCount,
       imports: impRes.deletedCount,
+      bankConnections: bankRes.deletedCount,
     },
   };
 }

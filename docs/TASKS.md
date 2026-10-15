@@ -94,11 +94,11 @@ Complete and verify each phase before starting the next.
 - [x] Automated test suite in `tests/security-and-readiness.test.ts` (121 total passing tests across 26 test suites).
 **Acceptance:** Critical security, multi-tenant isolation, and correctness tests pass; recovery is documented and tested.
 
-## Phase 11 — Optional bank integration
-- [ ] Verify provider, eligibility, terms, regulations, and legal requirements.
-- [ ] Implement consent, scope, expiry, revocation, and deletion.
-- [ ] Protect tokens, minimize data, reconcile duplicates, audit access.
-**Acceptance:** Approved, consent-based, revocable integration. Do not assume direct SBI API access.
+## Phase 11 — Optional bank integration (Checkpoint BANK-SYNC-01)
+- [x] Verify provider, eligibility, terms, regulations, and legal requirements (Audited RBI NBFC-AA Directions; Discovery Gate active: FIU license required).
+- [x] Implement consent, scope, expiry, revocation, and deletion (`server/models/bank-connection.ts`, `server/services/bank-sync/*`, cascading account purge).
+- [x] Protect tokens, minimize data, reconcile duplicates, audit access (Composite provider ref deduplication, replay defense, zero credential collection, 133 tests passing).
+**Acceptance:** Approved, consent-based, revocable integration architecture completed. Live sync strictly gated behind `FEATURE_BANK_SYNC=false` pending legal FIU registration. Zero credential simulation. Fallback statement import paths verified.
 
 ## Cross-phase release gate
 - [ ] No cross-user data exposure.
